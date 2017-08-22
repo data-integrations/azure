@@ -2,6 +2,7 @@
   "metadata": {
     "spec-version": "1.0"
   },
+  "display-name": "Microsoft Azure Data Lake Store",
   "configuration-groups": [
     {
       "label": "Azure Data Lake Store Configuration",
