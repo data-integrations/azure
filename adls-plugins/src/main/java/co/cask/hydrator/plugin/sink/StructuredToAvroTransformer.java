@@ -1,7 +1,22 @@
+/*
+ * Copyright © 2017 Cask Data, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package co.cask.hydrator.plugin.sink;
 
 import co.cask.cdap.api.data.format.StructuredRecord;
-import co.cask.hydrator.common.RecordConverter;
 import com.google.common.collect.Maps;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -14,25 +29,12 @@ import java.util.Map;
 /**
  * Structured Record to Avro converter
  */
-public class StructuredToAvroTransformer extends RecordConverter<StructuredRecord, GenericRecord> {
+public class StructuredToAvroTransformer extends AbstractStructuredRecordTransformer<GenericRecord> {
   private final Map<Integer, Schema> schemaCache;
-  private final co.cask.cdap.api.data.schema.Schema outputCDAPSchema;
-  private final Schema outputAvroSchema;
 
-  public StructuredToAvroTransformer(String outputSchema) {
+  public StructuredToAvroTransformer(co.cask.cdap.api.data.schema.Schema outputSchema) {
+    super(outputSchema);
     this.schemaCache = Maps.newHashMap();
-    try {
-      this.outputCDAPSchema =
-        (outputSchema != null) ? co.cask.cdap.api.data.schema.Schema.parseJson(outputSchema) : null;
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Unable to parse schema: Reason: " + e.getMessage(), e);
-    }
-    this.outputAvroSchema = (outputSchema != null) ? new Schema.Parser().parse(outputSchema) : null;
-  }
-
-  public GenericRecord transform(StructuredRecord structuredRecord) throws IOException {
-    return transform(structuredRecord,
-                     outputCDAPSchema == null ? structuredRecord.getSchema() : outputCDAPSchema);
   }
 
   @Override
@@ -54,14 +56,6 @@ public class StructuredToAvroTransformer extends RecordConverter<StructuredRecor
     return recordBuilder.build();
   }
 
-  @Override
-  protected Object convertBytes(Object field) {
-    if (field instanceof ByteBuffer) {
-      return field;
-    }
-    return ByteBuffer.wrap((byte[]) field);
-  }
-
   private Schema getAvroSchema(co.cask.cdap.api.data.schema.Schema cdapSchema) {
     int hashCode = cdapSchema.hashCode();
     if (schemaCache.containsKey(hashCode)) {
@@ -71,5 +65,13 @@ public class StructuredToAvroTransformer extends RecordConverter<StructuredRecor
       schemaCache.put(hashCode, avroSchema);
       return avroSchema;
     }
+  }
+
+  @Override
+  protected Object convertBytes(Object field) {
+    if (field instanceof ByteBuffer) {
+      return field;
+    }
+    return ByteBuffer.wrap((byte[]) field);
   }
 }

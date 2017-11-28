@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A {@link BatchSource} that reads from Azure Data Lake Store(ADLS).
  */
-@Plugin(type = "batchsource")
+@Plugin(type = BatchSource.PLUGIN_TYPE)
 @Name("AzureDataLakeStore")
 @Description("Batch source to use Azure Data Lake Store(ADLS) as a source.")
 public class ADLSBatchSource extends AbstractFileBatchSource {
