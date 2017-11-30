@@ -30,7 +30,7 @@
         },
         {
           "widget-type": "textbox",
-          "label": "Azure Data Lake Store Refresh Token",
+          "label": "Azure Data Lake Store Refresh Token URL",
           "name": "refreshTokenURL"
         },
         {
@@ -42,6 +42,23 @@
           "widget-type": "json-editor",
           "label": "File System Properties",
           "name": "fileSystemProperties"
+        },
+        {
+          "widget-type": "select",
+          "label": "File Output Format",
+          "name": "outputFormat",
+          "widget-attributes": {
+            "values": [
+              "text",
+              "avro"
+            ],
+            "default": "text"
+          }
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Field Delimiter (only when output format is text)",
+          "name": "textDelimiter"
         }
       ]
     }
