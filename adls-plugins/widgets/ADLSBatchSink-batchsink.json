@@ -58,7 +58,7 @@
         {
           "widget-type": "textbox",
           "label": "Field Delimiter (only when output format is text)",
-          "name": "textDelimiter"
+          "name": "fieldDelimiter"
         }
       ]
     }
