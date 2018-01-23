@@ -2,7 +2,7 @@
 
 Description
 -----------
-Azure Data Lake Store Batch Sink writes data to Azure Data Lake Store directory in avro or text format.
+Azure Data Lake Store Batch Sink writes data to Azure Data Lake Store directory in avro, orc or text format.
 
 Properties
 ----------
@@ -19,9 +19,9 @@ Properties
 **fileSystemProperties:** A JSON string representing a map of properties
 needed for the distributed file system. (Macro-enabled)
 
-**outputFormat:** The format of output files. Must be 'avro' or 'text'.
+**outputFormat:** The format of output files. Must be 'avro', 'text' or 'orc'.
 
-**schema:** Output schema of the JSON document. Required for avro output format. If left empty for text output format, the schema of input records will be used. This must be a subset of the schema of input records. Fields of type ARRAY, MAP, and RECORD are not supported with the text format. Fields of type UNION are only supported if they represent a nullable type.
+**schema:** Output schema of the JSON document. Required for avro and orc output formats. If left empty for text output format, the schema of input records will be used. This must be a subset of the schema of input records. Fields of type ARRAY, MAP, and RECORD are not supported with the text format. Fields of type UNION are only supported if they represent a nullable type.
 
 **textDelimiter:** Delimiter to place between fields. Only used by the text output format. Defaults to tab.
 

@@ -29,6 +29,7 @@ import co.cask.cdap.etl.api.PipelineConfigurer;
 import co.cask.cdap.etl.api.batch.BatchRuntimeContext;
 import co.cask.cdap.etl.api.batch.BatchSink;
 import co.cask.cdap.etl.api.batch.BatchSinkContext;
+import co.cask.hydrator.common.HiveSchemaConverter;
 import co.cask.hydrator.common.ReferenceBatchSink;
 import co.cask.hydrator.common.ReferencePluginConfig;
 import co.cask.hydrator.common.batch.JobUtils;
@@ -43,6 +44,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.orc.mapreduce.OrcOutputFormat;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -64,8 +66,10 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
   private static final Type MAP_STRING_STRING_TYPE = new TypeToken<Map<String, String>>() { }.getType();
   private static final String AVRO = "avro";
   private static final String TEXT = "text";
+  private static final String ORC = "orc";
   private StructuredToAvroTransformer avroTransformer;
   private StructuredToTextTransformer textTransformer;
+  private StructuredToOrcTransformer orcTransformer;
 
   public ADLSBatchSink(AzureBatchSinkConfig config) {
     super(config);
@@ -96,6 +100,12 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
       AvroJob.setOutputKeySchema(job, avroSchema);
       context.addOutput(Output.of(config.referenceName,
                                   new SinkOutputFormatProvider(AvroKeyOutputFormat.class.getName(), conf)));
+    } else if (ORC.equals(config.outputFormat)) {
+      StringBuilder builder = new StringBuilder();
+      HiveSchemaConverter.appendType(builder, config.getSchema());
+      conf.set("orc.mapred.output.schema", builder.toString());
+      context.addOutput(Output.of(config.referenceName,
+                                  new SinkOutputFormatProvider(OrcOutputFormat.class.getName(), conf)));
     } else {
       context.addOutput(Output.of(config.referenceName,
                                   new SinkOutputFormatProvider(TextOutputFormat.class.getName(), conf)));
@@ -106,6 +116,8 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
   public void initialize(BatchRuntimeContext context) throws Exception {
     if (AVRO.equals(config.outputFormat)) {
       avroTransformer = new StructuredToAvroTransformer(config.getSchema());
+    } else if (ORC.equals(config.outputFormat)) {
+      orcTransformer = new StructuredToOrcTransformer(config.getSchema());
     } else {
       textTransformer = new StructuredToTextTransformer(config.getFieldDelimiter(), config.getSchema());
     }
@@ -118,6 +130,8 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
     if (AVRO.equals(config.outputFormat)) {
       emitter.emit(new KeyValue<>((Object) new AvroKey<>(avroTransformer.transform(input)),
                                   (Object) NullWritable.get()));
+    } else if (ORC.equals(config.outputFormat)) {
+      emitter.emit(new KeyValue<>((Object) NullWritable.get(), (Object) orcTransformer.transform(input)));
     } else {
       emitter.emit(new KeyValue<>((Object) textTransformer.transform(input), (Object) NullWritable.get()));
     }
@@ -202,8 +216,8 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
       if (!containsMacro("path") && !path.startsWith("adl://")) {
         throw new IllegalArgumentException("Path must start with adl:// for ADLS input files.");
       }
-      if (AVRO.equals(outputFormat) && !containsMacro("schema") && schema == null) {
-        throw new IllegalArgumentException("Output schema must be specified for avro format output files.");
+      if ((AVRO.equals(outputFormat) || ORC.equals(outputFormat)) && !containsMacro("schema") && schema == null) {
+        throw new IllegalArgumentException("Output schema must be specified for avro or orc format output files.");
       }
     }
 
