@@ -50,7 +50,8 @@
           "widget-attributes": {
             "values": [
               "text",
-              "avro"
+              "avro",
+              "orc"
             ],
             "default": "text"
           }
