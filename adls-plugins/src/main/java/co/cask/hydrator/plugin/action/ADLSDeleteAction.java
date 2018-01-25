@@ -1,6 +1,7 @@
 package co.cask.hydrator.plugin.action;
 
 import co.cask.cdap.api.annotation.Description;
+import co.cask.cdap.api.annotation.Macro;
 import co.cask.cdap.api.annotation.Name;
 import co.cask.cdap.api.annotation.Plugin;
 import co.cask.cdap.api.plugin.PluginConfig;
@@ -115,25 +116,31 @@ public class ADLSDeleteAction extends Action {
       "the file will be removed. If path points to a directory with no regex specified, the directory and all of " +
       "its contents will be removed. If a regex is specified, only the files and directories matching that regex " +
       "will be removed")
+    @Macro
     private String path;
 
     @Description("Regular expression to filter the files in the source directory that will be deleted")
     @Nullable
+    @Macro
     private String fileRegex;
 
     @Description("Indicates if the pipeline should continue if the delete fails")
     private boolean continueOnError;
 
     @Description("ADLS File system uri")
+    @Macro
     private String fileSystemUri;
 
     @Description("ADLS refresh token URL")
+    @Macro
     private String refreshTokenURL;
 
     @Description("ADLS client id")
+    @Macro
     private String clientId;
 
     @Description("ADLS credentials")
+    @Macro
     private String credentials;
 
     @VisibleForTesting
