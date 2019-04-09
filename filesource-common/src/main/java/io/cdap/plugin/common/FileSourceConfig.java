@@ -14,11 +14,11 @@
  * the License.
  */
 
-package co.cask.hydrator.common;
+package io.cdap.plugin.common;
 
-import co.cask.cdap.api.annotation.Description;
-import co.cask.cdap.api.annotation.Macro;
-import co.cask.hydrator.common.ReferencePluginConfig;
+import io.cdap.cdap.api.annotation.Description;
+import io.cdap.cdap.api.annotation.Macro;
+import io.cdap.plugin.common.ReferencePluginConfig;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -30,7 +30,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Abstract file co.cask.hydrator.co.cask.hydrator.plugin.source config
+ * Abstract file io.cdap.io.cdap.plugin.source config
  */
 public abstract class FileSourceConfig extends ReferencePluginConfig {
   protected static final String MAX_SPLIT_SIZE_DESCRIPTION = "Maximum split-size for each mapper in the MapReduce " +

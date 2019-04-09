@@ -14,15 +14,15 @@
  * the License.
  */
 
-package co.cask.hydrator.plugin.source;
+package io.cdap.plugin.source;
 
-import co.cask.cdap.api.annotation.Description;
-import co.cask.cdap.api.annotation.Macro;
-import co.cask.cdap.api.annotation.Name;
-import co.cask.cdap.api.annotation.Plugin;
-import co.cask.cdap.etl.api.batch.BatchSource;
-import co.cask.hydrator.common.AbstractFileBatchSource;
-import co.cask.hydrator.common.FileSourceConfig;
+import io.cdap.cdap.api.annotation.Description;
+import io.cdap.cdap.api.annotation.Macro;
+import io.cdap.cdap.api.annotation.Name;
+import io.cdap.cdap.api.annotation.Plugin;
+import io.cdap.cdap.etl.api.batch.BatchSource;
+import io.cdap.plugin.common.AbstractFileBatchSource;
+import io.cdap.plugin.common.FileSourceConfig;
 
 import java.util.HashMap;
 import java.util.Map;
