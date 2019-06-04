@@ -13,65 +13,108 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package io.cdap.plugin.common.azurecred;
 
+
 import com.microsoft.azure.keyvault.KeyVaultClient;
-import com.microsoft.azure.keyvault.authentication.KeyVaultCredentials;
+//import com.microsoft.azure.keyvault.authentication.KeyVaultCredentials;
 import com.microsoft.azure.keyvault.models.SecretBundle;
+import io.netty.util.internal.StringUtil;
+import java.io.IOException;
+//import java.util.Arrays;
+//import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.security.alias.CredentialProvider;
+import org.apache.hadoop.security.alias.CredentialProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//for jceks
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.alias.CredentialProvider;
-import org.apache.hadoop.security.alias.CredentialProviderFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.io.IOException;
 
 public class AzureClientSecretService {
 
   private static Logger logger = LoggerFactory.getLogger(AzureClientSecretService.class);
 
-  public static HashMap<String, String> getADLSSecretsUsingJceksAndKV(String keyVaultUrl, HashMap<String, String> credMap) {
-    /* First get the credentials to access KeyVault from Jceks file */
-    HashMap<String, String> keymap = new HashMap<String, String>();
-    try {
-      keymap = getSecretsFromJcek("fs.adl.oauth2.client.id,fs.adl.oauth2.credential"); 
-      logger.info("KeyVault access identified");
-    } catch (Exception e) {
-      logger.error("jcek Exception : " + e);
+  public static HashMap<String, String> getADLSSecretsUsingJceksAndKV(String keyVaultUrl, HashMap<String, String> credMap,
+                                                                      Map<String, String> properties) {
+    // First get the credentials to access KeyVault from Jceks file
+    Map<String, String> keymap = properties;
+
+    if (!(keymap.containsKey("fs.adl.oauth2.client.id") && keymap.containsKey("fs.adl.oauth2.credential"))) {
+      try {
+        keymap = getSecretsFromJcek("fs.adl.oauth2.client.id,fs.adl.oauth2.credential",
+                                            properties.getOrDefault("hadoop.security.credential.provider.path", getJceksPath()));
+        logger.info("KeyVault access identified");
+      } catch (Exception e) {
+        logger.error("jcek Exception : " + e);
+      }
     }
     return getSecretsFromKV(keyVaultUrl, credMap, keymap.get("fs.adl.oauth2.client.id"), keymap.get("fs.adl.oauth2.credential"));
   }
 
-  public static HashMap<String, String> getSecretsFromKV(String vaultURI, HashMap<String, String> secretMap, String kvId, String kvSecret) {
 
-    /* Get keyVault client by providing authorized credentials as read from jceks */
-    KeyVaultClient client = new KeyVaultClient(new ClientSecretKeyVaultCredential(kvId, kvSecret));
-    
-    /* Now, Replace value in secretMap with actual value fetched from keyVault */
-    for (String key : secretMap.keySet()) {
-      SecretBundle secret = client.getSecret(vaultURI, secretMap.get(key));
-      secretMap.put(key,secret.value());
-    }
-    return secretMap;
+  public static String getJceksPath() {
+      String jceks = "jceks://hdfs@mycluster/etc/security/jceks/adls.jceks";  // init with default for Azure
+      try {
+          Configuration conf = new Configuration();
+          // Assumption: this path is always correct in Azure for hdfs-site.xml and core-site.xml
+          conf.addResource("/etc/hadoop/conf/hdfs-site.xml");
+          conf.addResource("/etc/hadoop/conf/core-site.xml");
+          FileSystem fs = FileSystem.get(conf);
+          String jpath = fs.getConf().get("hadoop.security.credential.provider.path","");
+          String ns = fs.getConf().get("dfs.internal.nameservices","");
+          ns = ns.split(",")[0].trim();     //pick the first nameservice string specified; all are valid ones
+          if (!StringUtil.isNullOrEmpty(jpath)) {
+              // japth is foud in core-site.xml and therefore we should look for jceks path  instead of default
+              for (String ss : jpath.split(",")) {
+                  // there could be multiple paths present, lets try picking the first adls.jceks path
+                  String s = ss.trim();
+                  String adlsJceks = s.substring(s.lastIndexOf("/")+1).trim();
+                  if (adlsJceks.equalsIgnoreCase("adls.jceks")) {
+                      // adls.jceks found
+                      if (s.startsWith("jceks://file/") || s.startsWith("localjceks://file/")
+                          || s.startsWith("jceks://hdfs@") || s.startsWith("localjceks://hdfs@")
+                          || (StringUtil.isNullOrEmpty(ns) && (s.startsWith("jceks://hdfs") || s.startsWith("localjceks://hdfs"))) ) {
+                          // Case1: local jceks file case or running on local sandbox case
+                          // Case2: already a fully qualified hdfs with nameservice path
+                          // Case3: nameservice not present(non-HA case) and path is already hdfs qualified
+                          // in all above cases, use the path as specified, nothing more to do
+                          jceks = s;
+                      } else if (!StringUtil.isNullOrEmpty(ns) 
+                                && (s.startsWith("jceks://hdfs") || s.startsWith("localjceks://hdfs")) ) {
+                              // insert nameservice for already qualified hdfs path
+                              jceks = s.split("hdfs")[0] + "hdfs@" + ns + "/" + s.split("hdfs")[1];
+                      } else {
+                          // its only path and default is HDFS path ; so we should qualify it with nameservice
+                          if (StringUtil.isNullOrEmpty(ns)) {
+                              jceks = "localjceks://hdfs/" + s;   // not supporting jceks/user scheme type for now
+                          } else {
+                              jceks = "localjceks://hdfs@" + ns + "/" + s;
+                          }
+                      }
+                      logger.debug("final jceks to be used: jceks="+jceks);
+                      break;    // found 1st adls.jceks, give priority to first one
+                  }
+              }
+          }
+      } catch (Exception e) {
+          logger.error("Exception caught while trying to read jceks file : " + e.getMessage());
+      }
+      return jceks;
   }
 
-  public static HashMap<String, String> getSecretsFromJcek(String csvKeys) throws IOException {
 
+  public static HashMap<String, String> getSecretsFromJcek(String csvKeys, String jceksPath) throws IOException {
     HashMap<String, String> keyPasses = new HashMap<String, String>();
     String[] keys = csvKeys.split(",");
+    logger.debug("jceksPath : " + jceksPath + "; csvKeys : " + csvKeys);
 
-    /* Fetch password from configured credential provider path */
+    // Fetch password from configured credential provider path
     Configuration c = new Configuration();
-    /* TODO: jceks file location hardcoded for now, it is to be replaced by some other strategy like either reading from
-     * core-site.xml or cdap environment, etc. Till this story is defined, we keep it hard-coded
-     */
-    c.set(CredentialProviderFactory.CREDENTIAL_PROVIDER_PATH, "jceks://hdfs@mycluster/etc/security/jceks/adls.jceks");
+    c.set(CredentialProviderFactory.CREDENTIAL_PROVIDER_PATH, jceksPath);
     CredentialProvider credentialProvider = CredentialProviderFactory.getProviders(c).get(0);
     for(String key : keys) {
       CredentialProvider.CredentialEntry entry = credentialProvider.getCredentialEntry(key);
@@ -82,6 +125,18 @@ public class AzureClientSecretService {
       }
     }
     return keyPasses;
+  }
+
+  public static HashMap<String, String> getSecretsFromKV(String vaultURI, HashMap<String, String> secretMap, String kvId, String kvSecret) {
+      // Get keyVault client by providing authorized credentials as read from jceks
+      KeyVaultClient client = new KeyVaultClient(new ClientSecretKeyVaultCredential(kvId, kvSecret));
+
+      // Now, Replace value in secretMap with actual value fetched from keyVault
+      for (String key : secretMap.keySet()) {
+          SecretBundle secret = client.getSecret(vaultURI, secretMap.get(key));
+          secretMap.put(key,secret.value());
+      }
+      return secretMap;
   }
 }
 

@@ -21,9 +21,9 @@ import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.etl.api.batch.BatchSource;
+import io.cdap.plugin.common.azurecred.AzureClientSecretService;
 import io.cdap.plugin.common.AbstractFileBatchSource;
 import io.cdap.plugin.common.FileSourceConfig;
-import io.cdap.plugin.common.azurecred.AzureClientSecretService;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -103,7 +103,7 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
       properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
 
       if (keyVaultUrl != null && !keyVaultUrl.isEmpty()) {
-        Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames));
+        Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames), properties);
         properties.put("dfs.adls.oauth2.refresh.url", credentials.get("RefreshTokenUrl_KeyName"));
         properties.put("dfs.adls.oauth2.client.id", credentials.get("ClientId_KeyName"));
         properties.put("dfs.adls.oauth2.credential", credentials.get("ClientCredential_KeyName"));

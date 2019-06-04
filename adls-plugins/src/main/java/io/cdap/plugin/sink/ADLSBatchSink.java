@@ -29,6 +29,7 @@ import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchRuntimeContext;
 import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
+import io.cdap.plugin.common.azurecred.AzureClientSecretService;
 import io.cdap.plugin.common.HiveSchemaConverter;
 import io.cdap.plugin.common.ReferenceBatchSink;
 import io.cdap.plugin.common.ReferencePluginConfig;
@@ -45,7 +46,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.orc.mapreduce.OrcOutputFormat;
-import io.cdap.plugin.common.azurecred.AzureClientSecretService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,7 +245,7 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
       properties.put("fs.AbstractFileSystem.adl.impl", "org.apache.hadoop.fs.adl.Adl");
       properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
       if (keyVaultUrl != null && !keyVaultUrl.isEmpty()) {
-        Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames));
+        Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames), properties);
         properties.put("dfs.adls.oauth2.refresh.url", credentials.get("RefreshTokenUrl_KeyName"));
         properties.put("dfs.adls.oauth2.client.id", credentials.get("ClientId_KeyName"));
         properties.put("dfs.adls.oauth2.credential", credentials.get("ClientCredential_KeyName"));
