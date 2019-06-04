@@ -45,6 +45,10 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.orc.mapreduce.OrcOutputFormat;
+import io.cdap.plugin.common.azurecred.AzureClientSecretService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -61,6 +65,7 @@ import javax.annotation.Nullable;
 @Description("ADLS Batch Sink")
 public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, Object> {
   @SuppressWarnings("unused")
+  private static Logger logger = LoggerFactory.getLogger(ADLSBatchSink.class);
   private final AzureBatchSinkConfig config;
   private static final Gson GSON = new Gson();
   private static final Type MAP_STRING_STRING_TYPE = new TypeToken<Map<String, String>>() { }.getType();
@@ -148,14 +153,27 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
     @Macro
     public String path;
 
+    @Nullable
+    @Description("The Microsoft Azure Data Lake credentials.")
+    @Macro
+    private String keyVaultUrl;
+
+    @Nullable
+    @Description("The Microsoft Azure Data Lake credentials.")
+    @Macro
+    private String kvKeyNames;
+
+    @Nullable
     @Description("The Microsoft Azure Data Lake client id.")
     @Macro
     private String clientId;
 
+    @Nullable
     @Description("The Microsoft Azure Data Lake refresh token URL.")
     @Macro
     private String refreshTokenURL;
 
+    @Nullable
     @Description("The Microsoft Azure Data Lake credentials.")
     @Macro
     private String credentials;
@@ -226,10 +244,26 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
       properties.put("fs.adl.impl", "org.apache.hadoop.fs.adl.AdlFileSystem");
       properties.put("fs.AbstractFileSystem.adl.impl", "org.apache.hadoop.fs.adl.Adl");
       properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
-      properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
-      properties.put("dfs.adls.oauth2.client.id", clientId);
-      properties.put("dfs.adls.oauth2.credential", credentials);
+      if (keyVaultUrl != null && !keyVaultUrl.isEmpty()) {
+        Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames));
+        properties.put("dfs.adls.oauth2.refresh.url", credentials.get("RefreshTokenUrl_KeyName"));
+        properties.put("dfs.adls.oauth2.client.id", credentials.get("ClientId_KeyName"));
+        properties.put("dfs.adls.oauth2.credential", credentials.get("ClientCredential_KeyName"));
+      } else {
+        properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
+        properties.put("dfs.adls.oauth2.client.id", clientId);
+        properties.put("dfs.adls.oauth2.credential", credentials);
+      }
       return properties;
+    }
+
+    protected HashMap<String, String> getKvKeyNamesMap(String kvKeyNames) {
+       HashMap<String, String> credMap = new HashMap<String, String>();
+       String[] keypairs = kvKeyNames.split(",");
+       for (String k : keypairs) {
+         credMap.put(k.split(":")[1], k.split(":")[0]);
+       }
+       return credMap;
     }
 
     @Nullable

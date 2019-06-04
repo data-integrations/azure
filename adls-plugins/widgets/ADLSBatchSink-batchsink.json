@@ -25,6 +25,21 @@
         },
         {
           "widget-type": "textbox",
+          "label": "Azure Key Vault URL",
+          "name": "keyVaultUrl"
+        },
+        {
+          "widget-type": "keyvalue-dropdown",
+          "label": "Azure KeyVault Secret Key Names",
+          "name": "kvKeyNames",
+          "widget-attributes": {
+              "delimiter": ",",
+              "kv-delimiter": ":",
+              "dropdownOptions": [ "ClientId_KeyName", "ClientCredential_KeyName","RefreshTokenUrl_KeyName"]
+          }
+        },
+        {
+          "widget-type": "textbox",
           "label": "Azure Data Lake Store Client Id",
           "name": "clientId"
         },
