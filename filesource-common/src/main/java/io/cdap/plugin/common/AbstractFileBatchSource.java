@@ -207,15 +207,4 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
       throw new IllegalArgumentException(String.format("Error deleting temporary file. %s.", e.getMessage()), e);
     }
   }
-
-  /**
-   * Endpoint method to get the output schema of a query.
-   *
-   * @param request Config for the io.cdap.plugin.source.
-   * @return output schema
-   */
-  @javax.ws.rs.Path("getSchema")
-  public Schema getSchema(T request) {  
-    return PathTrackingInputFormat.getOutputSchema(request.pathField);
-  }
 }
