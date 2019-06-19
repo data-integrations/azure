@@ -23,7 +23,6 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.dataset.DatasetProperties;
 import io.cdap.cdap.api.dataset.lib.KeyValue;
 import io.cdap.cdap.api.dataset.lib.KeyValueTable;
-import io.cdap.cdap.api.plugin.EndpointPluginContext;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchSourceContext;
@@ -207,17 +206,5 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
     } catch (IOException e) {
       throw new IllegalArgumentException(String.format("Error deleting temporary file. %s.", e.getMessage()), e);
     }
-  }
-
-  /**
-   * Endpoint method to get the output schema of a query.
-   *
-   * @param request Config for the io.cdap.plugin.source.
-   * @param pluginContext context to create plugins
-   * @return output schema
-   */
-  @javax.ws.rs.Path("getSchema")
-  public Schema getSchema(T request, EndpointPluginContext pluginContext) {
-    return PathTrackingInputFormat.getOutputSchema(request.pathField);
   }
 }
