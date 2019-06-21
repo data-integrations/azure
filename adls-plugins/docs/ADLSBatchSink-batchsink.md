@@ -40,9 +40,25 @@ needed for the distributed file system. (Macro-enabled)
 
 DevNote
 -------
-For using keyVault approach, it is required that underlying platform, on which CDAP is running, must contain a `/etc/security/jceks/adls.jceks`
-file which is generated using `hadoop-credential` utility. This `jceks` file is expected to contain values for following `keys`
-so as to access `KeyVault` itself - `fs.adl.oauth2.client.id` and `fs.adl.oauth2.credential`.
+
+For using keyVault approach, plugin needs value of properties `fs.adl.oauth2.client.id` and `fs.adl.oauth2.credential`. One can specify these properties in plugin's config `fileSystemProperties`.
+
+However, even to read keyVault credentials securely, cluster admins can generate encrypted `adls.jceks` using hadoop credential utility containing these properties values as discussed here : https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/CredentialProviderAPI.html
+
+The generated `adls.jceks` can be placed on all cluster nodes at some secured path (accessible only to cdap pipelines i.e. not exposed to user roles) by cluster admin. 
+
+The typical flow is :
+Plugin -- reads keyVault credentials from -------------------------------------------> `adls.jceks` file
+Plugin -- reads adls.jceks path from ------------------------------------------------> `core-site.xml`
+Plugin -- reads dfs.internal.nameservices (to insert in adls.jceks path) from -------> `hdfs-site.xml`
+Plugin -- reads ADLS credentials from -----------------------------------------------> `KeyVault store`
+Plugin -- accesses ------------------------------------------------------------------> `ADLS folders`
+
+(1) jceks path is expected to be a fully qualitfied path with identifier `hdfs` or `file` and with nameservice. Refer `https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/CredentialProviderAPI.html`. 
+(2) Default `adls.jceks` path referred is `jceks://hdfs@mycluster/etc/security/jceks/adls.jceks`
+(3) if `core-site.xml` is provided, plugin tries to read jceks path from property `hadoop.security.credential.provider.path`
+(4) if `hdfs-site.xml` is provided, plugin tries to read nameservice from property `dfs.internal.nameservices` and update it in jceks path (if not already the case)
+(5) jceks file is expected to be present on all cluster nodes at path `/etc/security/jceks/adls.jceks`
 
 
 Example
