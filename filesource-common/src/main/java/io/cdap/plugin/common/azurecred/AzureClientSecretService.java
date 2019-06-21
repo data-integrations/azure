@@ -17,16 +17,14 @@ package io.cdap.plugin.common.azurecred;
 
 
 import com.microsoft.azure.keyvault.KeyVaultClient;
-//import com.microsoft.azure.keyvault.authentication.KeyVaultCredentials;
 import com.microsoft.azure.keyvault.models.SecretBundle;
 import io.netty.util.internal.StringUtil;
 import java.io.IOException;
-//import java.util.Arrays;
-//import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.alias.CredentialProvider;
 import org.apache.hadoop.security.alias.CredentialProviderFactory;
 import org.slf4j.Logger;
@@ -38,12 +36,19 @@ public class AzureClientSecretService {
 
   private static Logger logger = LoggerFactory.getLogger(AzureClientSecretService.class);
 
+  /* To read ADLS credentials stored in KeyVault, we need to first access KeyVault Store itself
+   * 1. Either user has provided KeyVault credentials itself in properties : `fs.adl.oauth2.client.id` and `fs.adl.oauth2.credential`
+   * 2. If not, these credentials are encrypted in a hadoop's jceks file.
+   * 3. jceks file path is either specified by user in property - hadoop.security.credential.provider.path
+   * 4. If not, we should get this property value from core-site.xml
+   * 5. If path not provided in core-site.xml also, we use the default jceks path on an azure vm
+   */
   public static HashMap<String, String> getADLSSecretsUsingJceksAndKV(String keyVaultUrl, HashMap<String, String> credMap,
                                                                       Map<String, String> properties) {
-    // First get the credentials to access KeyVault from Jceks file
     Map<String, String> keymap = properties;
 
     if (!(keymap.containsKey("fs.adl.oauth2.client.id") && keymap.containsKey("fs.adl.oauth2.credential"))) {
+      // First get the credentials to access KeyVault from Jceks file
       try {
         keymap = getSecretsFromJcek("fs.adl.oauth2.client.id,fs.adl.oauth2.credential",
                                             properties.getOrDefault("hadoop.security.credential.provider.path", getJceksPath()));
@@ -57,49 +62,59 @@ public class AzureClientSecretService {
 
 
   public static String getJceksPath() {
+
       String jceks = "jceks://hdfs@mycluster/etc/security/jceks/adls.jceks";  // init with default for Azure
+
       try {
           Configuration conf = new Configuration();
           // Assumption: this path is always correct in Azure for hdfs-site.xml and core-site.xml
-          conf.addResource("/etc/hadoop/conf/hdfs-site.xml");
-          conf.addResource("/etc/hadoop/conf/core-site.xml");
-          FileSystem fs = FileSystem.get(conf);
-          String jpath = fs.getConf().get("hadoop.security.credential.provider.path","");
-          String ns = fs.getConf().get("dfs.internal.nameservices","");
+          Path coresite = new Path("file:///etc/hadoop/conf/hdfs-site.xml");
+          Path hdfssite = new Path("file:///etc/hadoop/conf/core-site.xml"));
+          conf.addResource(coresite);
+          conf.addResource(hdfssite);
+          FileSystem fs = coresite.getFileSystem(conf);
+          String jpath = fs.getConf().get("hadoop.security.credential.provider.path","jceks://hdfs@mycluster/etc/security/jceks/adls.jceks");
+          String ns = fs.getConf().get("dfs.internal.nameservices","mycluster");
+          logger.info("jpath : " + jpath + "; ns : " + ns);
           ns = ns.split(",")[0].trim();     //pick the first nameservice string specified; all are valid ones
+          fs.close();
+
           if (!StringUtil.isNullOrEmpty(jpath)) {
-              // japth is foud in core-site.xml and therefore we should look for jceks path  instead of default
+              // jpath list is found in core-site.xml but there could be multiple jceks present in this list and we are looking for one with name adls.jceks
               for (String ss : jpath.split(",")) {
                   // there could be multiple paths present, lets try picking the first adls.jceks path
                   String s = ss.trim();
                   String adlsJceks = s.substring(s.lastIndexOf("/")+1).trim();
-                  if (adlsJceks.equalsIgnoreCase("adls.jceks")) {
-                      // adls.jceks found
+                  logger.debug("inspecting for jpath : " + ss);
+                  if (true == adlsJceks.equalsIgnoreCase("adls.jceks")) {
+                      /* We need to insert the hdfs nameservice and fully qualify the hdfs path
+                       */
                       if (s.startsWith("jceks://file/") || s.startsWith("localjceks://file/")
                           || s.startsWith("jceks://hdfs@") || s.startsWith("localjceks://hdfs@")
                           || (StringUtil.isNullOrEmpty(ns) && (s.startsWith("jceks://hdfs") || s.startsWith("localjceks://hdfs"))) ) {
-                          // Case1: local jceks file case or running on local sandbox case
-                          // Case2: already a fully qualified hdfs with nameservice path
-                          // Case3: nameservice not present(non-HA case) and path is already hdfs qualified
-                          // in all above cases, use the path as specified, nothing more to do
+                          /* Case1: local jceks file case or running on local sandbox case
+                           * Case2: already a fully qualified hdfs path with nameservice
+                           * Case3: nameservice not present(non-HA case) and path is already hdfs qualified
+                           * in all above cases, use the path as specified, nothing more to do
+                           */
                           jceks = s;
                       } else if (!StringUtil.isNullOrEmpty(ns) 
                                 && (s.startsWith("jceks://hdfs") || s.startsWith("localjceks://hdfs")) ) {
                               // insert nameservice for already qualified hdfs path
                               jceks = s.split("hdfs")[0] + "hdfs@" + ns + "/" + s.split("hdfs")[1];
                       } else {
-                          // its only path and default is HDFS path ; so we should qualify it with nameservice
                           if (StringUtil.isNullOrEmpty(ns)) {
+                              // nameservice not present
                               jceks = "localjceks://hdfs/" + s;   // not supporting jceks/user scheme type for now
                           } else {
                               jceks = "localjceks://hdfs@" + ns + "/" + s;
                           }
                       }
-                      logger.debug("final jceks to be used: jceks="+jceks);
-                      break;    // found 1st adls.jceks, give priority to first one
+                      break;    // give priority to first adls.jceks file found
                   }
               }
           }
+          logger.info("returning jceks path : " + jceks);
       } catch (Exception e) {
           logger.error("Exception caught while trying to read jceks file : " + e.getMessage());
       }

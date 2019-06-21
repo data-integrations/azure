@@ -115,6 +115,7 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
       return properties;
     }
 
+    /* Cretae a map from KeyVault config */
     protected HashMap<String, String> getKvKeyNamesMap(String kvKeyNames) {
       HashMap<String, String> credMap = new HashMap<String, String>();
       String[] keypairs = kvKeyNames.split(",");
