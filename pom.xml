@@ -83,6 +83,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cdap.version>6.0.0-SNAPSHOT</cdap.version>
     <cdap.plugin.version>2.2.0-SNAPSHOT</cdap.plugin.version>
+    <netty.common.version>4.1.16.Final</netty.common.version>
+    <orc.mapreduce.version>1.1.0</orc.mapreduce.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
@@ -149,27 +151,6 @@
             <source>1.7</source>
             <target>1.7</target>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>net.alchim31.maven</groupId>
-          <artifactId>scala-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>scala-compile-first</id>
-              <phase>process-resources</phase>
-              <goals>
-                <goal>add-source</goal>
-                <goal>compile</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>scala-test-compile</id>
-              <phase>process-test-resources</phase>
-              <goals>
-                <goal>testCompile</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.felix</groupId>

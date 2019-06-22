@@ -31,12 +31,12 @@
     <dependency>
       <groupId>io.cdap.plugin</groupId>
       <artifactId>filesource-common</artifactId>
-      <version>1.7.0</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.orc</groupId>
       <artifactId>orc-mapreduce</artifactId>
-      <version>1.1.0</version>
+      <version>${orc.mapreduce.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-common</artifactId>
-      <version>4.1.16.Final</version>
+      <version>${netty.common.version}</version>
     </dependency>
   </dependencies>
 
@@ -75,26 +75,6 @@
           </execution>
         </executions>
       </plugin>
-      <!--plugin>
-        <groupId>co.cask</groupId>
-        <artifactId>cdap-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <configuration>
-                <cdapArtifacts>
-                        <parent>system:cdap-data-streams[4.0.0,9.0.0)</parent>
-                        <parent>system:cdap-data-pipeline[4.0.0,9.0.0)</parent>
-                </cdapArtifacts>
-        </configuration>
-        <executions>
-                <execution>
-                        <id>create-artifact-config</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                                <goal>create-plugin-json</goal>
-                        </goals>
-                </execution>
-        </executions>
-      </plugin-->
     </plugins>
   </build>
 

@@ -14,10 +14,10 @@ Properties
 Either of configs {keyVaultUrl,kvKeyNames} OR {clientId,refreshTokenURL,credentials} MUST be specified.
 If former information is available, later configs are NOT required. Infact, former one(keyVault) is a more secured 
 approach to avoid specifying sensitive Service Principle details in Plugin config.
-Please refer to `DevNote` for using `keyVault` approach.
+Please refer to `Notes on using KeyVault approach` below for more details.
 
 
-**keyVaultUrl** Provide Mircroft's KeyVault URL address from where client credentials can be fetched
+**keyVaultUrl** Provide Mircrosoft's KeyVault URL address from where client credentials can be fetched
 
 **kvKeyNames** Provide key names for secret key-values to be fetched from KeyVault store. For connecting to ADLS as ClientCredentials role, a service
 principle is required which gets specified by 3 configs - clientId, clientCrdential and RefreshTokenUrl. Therefore, each
@@ -38,8 +38,9 @@ needed for the distributed file system. (Macro-enabled)
 
 **textDelimiter:** Delimiter to place between fields. Only used by the text output format. Defaults to tab.
 
-DevNote
--------
+
+Notes on using KeyVault Approach
+---------------------------------
 
 For using keyVault approach, plugin needs value of properties `fs.adl.oauth2.client.id` and `fs.adl.oauth2.credential`. One can specify these properties in plugin's config `fileSystemProperties`.
 

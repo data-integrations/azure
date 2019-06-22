@@ -35,7 +35,7 @@
           "widget-attributes": {
               "delimiter": ",",
               "kv-delimiter": ":",
-              "dropdownOptions": [ "ClientId_KeyName", "ClientCredential_KeyName","RefreshTokenUrl_KeyName"]
+              "dropdownOptions": [ "Client-Id Key-Name", "Client Credential Key-Name","Refresh Token Url Key-Name"]
           }
         },
         {

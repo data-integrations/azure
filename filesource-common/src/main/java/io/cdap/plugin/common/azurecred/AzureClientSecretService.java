@@ -69,7 +69,7 @@ public class AzureClientSecretService {
           Configuration conf = new Configuration();
           // Assumption: this path is always correct in Azure for hdfs-site.xml and core-site.xml
           Path coresite = new Path("file:///etc/hadoop/conf/hdfs-site.xml");
-          Path hdfssite = new Path("file:///etc/hadoop/conf/core-site.xml"));
+          Path hdfssite = new Path("file:///etc/hadoop/conf/core-site.xml");
           conf.addResource(coresite);
           conf.addResource(hdfssite);
           FileSystem fs = coresite.getFileSystem(conf);

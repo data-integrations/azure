@@ -104,9 +104,9 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
 
       if (keyVaultUrl != null && !keyVaultUrl.isEmpty()) {
         Map<String, String> credentials = AzureClientSecretService.getADLSSecretsUsingJceksAndKV(keyVaultUrl, getKvKeyNamesMap(kvKeyNames), properties);
-        properties.put("dfs.adls.oauth2.refresh.url", credentials.get("RefreshTokenUrl_KeyName"));
-        properties.put("dfs.adls.oauth2.client.id", credentials.get("ClientId_KeyName"));
-        properties.put("dfs.adls.oauth2.credential", credentials.get("ClientCredential_KeyName"));
+        properties.put("dfs.adls.oauth2.refresh.url", credentials.get("Refresh Token Url Key-Name"));
+        properties.put("dfs.adls.oauth2.client.id", credentials.get("Client-Id Key-Name"));
+        properties.put("dfs.adls.oauth2.credential", credentials.get("Client Credential Key-Name"));
       } else {
         properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
         properties.put("dfs.adls.oauth2.client.id", clientId);
