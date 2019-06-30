@@ -17,9 +17,9 @@ approach to avoid specifying sensitive Service Principle details in Plugin confi
 Please refer to `Notes on using KeyVault approach` below for more details.
 
 
-**keyVaultUrl** Provide Mircrosoft's KeyVault URL address from where client credentials can be fetched
+**Key Vault URL** Provide Mircrosoft's KeyVault URL address from where client credentials can be fetched
 
-**kvKeyNames** Provide key names for secret key-values to be fetched from KeyVault store. For connecting to ADLS as ClientCredentials role, a service
+**Key Vault Secret Key Names** Provide key names for secret key-values to be fetched from KeyVault store. For connecting to ADLS as ClientCredentials role, a service
 principle is required which gets specified by 3 configs - clientId, clientCrdential and RefreshTokenUrl. Therefore, each
 specified key name MUST be specified the identifier to which it should be mapped.
 
