@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright © 2017-2019 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <parent>
     <artifactId>azure-adls-plugins</artifactId>
-    <groupId>co.cask.hydrator</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <groupId>io.cdap.plugin</groupId>
+    <version>1.7.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,9 +30,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>co.cask.hydrator</groupId>
+      <groupId>io.cdap.plugin</groupId>
       <artifactId>filesource-common</artifactId>
-      <version>1.2.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -30,7 +45,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <_exportcontents>co.cask.hydrator.plugin.*; co.cask.hydrator.common.*</_exportcontents>
+            <_exportcontents>io.cdap.plugin.*; io.cdap.plugin.common.*</_exportcontents>
             <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Embed-Directory>lib</Embed-Directory>

@@ -1,37 +1,34 @@
 /*
+ * Copyright © 2015 Cask Data, Inc.
  *
- *  * Copyright © 2017 Cask Data, Inc.
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  * use this file except in compliance with the License. You may obtain a copy of
- *  * the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  * License for the specific language governing permissions and limitations under
- *  * the License.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
-package co.cask.hydrator.common;
+package io.cdap.plugin.common;
 
-import co.cask.cdap.api.common.Bytes;
-import co.cask.cdap.api.data.batch.Input;
-import co.cask.cdap.api.data.format.StructuredRecord;
-import co.cask.cdap.api.data.schema.Schema;
-import co.cask.cdap.api.dataset.DatasetProperties;
-import co.cask.cdap.api.dataset.lib.KeyValue;
-import co.cask.cdap.api.dataset.lib.KeyValueTable;
-import co.cask.cdap.api.plugin.EndpointPluginContext;
-import co.cask.cdap.etl.api.Emitter;
-import co.cask.cdap.etl.api.PipelineConfigurer;
-import co.cask.cdap.etl.api.batch.BatchSourceContext;
-import co.cask.hydrator.common.ReferenceBatchSource;
-import co.cask.hydrator.common.SourceInputFormatProvider;
-import co.cask.hydrator.common.batch.JobUtils;
+import io.cdap.cdap.api.common.Bytes;
+import io.cdap.cdap.api.data.batch.Input;
+import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.cdap.api.data.schema.Schema;
+import io.cdap.cdap.api.dataset.DatasetProperties;
+import io.cdap.cdap.api.dataset.lib.KeyValue;
+import io.cdap.cdap.api.dataset.lib.KeyValueTable;
+import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import io.cdap.plugin.common.ReferenceBatchSource;
+import io.cdap.plugin.common.SourceInputFormatProvider;
+import io.cdap.plugin.common.batch.JobUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -57,7 +54,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Abstract file batch co.cask.hydrator.co.cask.hydrator.plugin.source
+ * Abstract file batch io.cdap.io.cdap.plugin.source
  * @param <T> Type of the config
  */
 public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
@@ -152,29 +149,31 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
     fs = FileSystem.get(conf);
 
     if (fileStatus == null && config.ignoreNonExistingFolders) {
-      path = fs.getWorkingDirectory().suffix("/tmp/tmp.txt");
-      LOG.warn(String.format("File/Folder specified in %s does not exists. Setting input path to %s.", config.getPath(),
-                             path));
-      fs.createNewFile(path);
-      conf.set(INPUT_NAME_CONFIG, path.toUri().getPath());
-      FileInputFormat.addInputPath(job, path);
+      LOG.warn(String.format("Input path %s does not exist and ignore non existing folder is set. " +
+          "The pipeline will not read any data", config.getPath()));
+      context.setInput(Input.of(config.referenceName,
+          new SourceInputFormatProvider(EmptyInputFormat.class.getName(), conf)));
+    } else if (fileStatus == null) {
+      LOG.error(String.format("Input path %s does not exist and this will fail the pipeline. " +
+              "To treat absence of input path as warning set Ignore Non existing folder property to true",
+          config.getPath()));
+      throw new RuntimeException(String.format("Input path %s does not exist", config.getPath()));
     } else {
       conf.set(INPUT_NAME_CONFIG, new Path(config.getPath()).toString());
       FileInputFormat.addInputPath(job, new Path(config.getPath()));
+      if (config.maxSplitSize != null) {
+        FileInputFormat.setMaxInputSplitSize(job, config.maxSplitSize);
+      }
+      if (CombinePathTrackingInputFormat.class.getName().equals(config.inputFormatClass)) {
+        PathTrackingInputFormat.configure(conf, config.pathField, config.filenameOnly);
+      }
+      context.setInput(Input.of(config.referenceName, new SourceInputFormatProvider(config.inputFormatClass, conf)));
     }
-
-    if (config.maxSplitSize != null) {
-      FileInputFormat.setMaxInputSplitSize(job, config.maxSplitSize);
-    }
-    if (CombinePathTrackingInputFormat.class.getName().equals(config.inputFormatClass)) {
-      PathTrackingInputFormat.configure(conf, config.pathField, config.filenameOnly);
-    }
-    context.setInput(Input.of(config.referenceName, new SourceInputFormatProvider(config.inputFormatClass, conf)));
   }
 
   @Override
   public void transform(KeyValue<Object, Object> input, Emitter<StructuredRecord> emitter) throws Exception {
-    // this co.cask.hydrator.plugin.source should never have (among other things) allowed specifying a custom input format class.
+    // this io.cdap.plugin.source should never have (among other things) allowed specifying a custom input format class.
     // this nasty casting is here for backwards compatibility.
     if (CombinePathTrackingInputFormat.class.getName().equals(config.inputFormatClass)) {
       emitter.emit((StructuredRecord) input.getValue());
@@ -207,17 +206,5 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
     } catch (IOException e) {
       throw new IllegalArgumentException(String.format("Error deleting temporary file. %s.", e.getMessage()), e);
     }
-  }
-
-  /**
-   * Endpoint method to get the output schema of a query.
-   *
-   * @param request Config for the co.cask.hydrator.plugin.source.
-   * @param pluginContext context to create plugins
-   * @return output schema
-   */
-  @javax.ws.rs.Path("getSchema")
-  public Schema getSchema(T request, EndpointPluginContext pluginContext) {
-    return PathTrackingInputFormat.getOutputSchema(request.pathField);
   }
 }

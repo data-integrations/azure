@@ -14,7 +14,7 @@
  * the License.
  */
 
-package co.cask.hydrator.common;
+package io.cdap.plugin.common;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
