@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 Cask Data, Inc.
+ * Copyright © 2017 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,15 +14,15 @@
  * the License.
  */
 
-package co.cask.hydrator.plugin.source;
+package io.cdap.plugin.source;
 
-import co.cask.cdap.api.annotation.Description;
-import co.cask.cdap.api.annotation.Macro;
-import co.cask.cdap.api.annotation.Name;
-import co.cask.cdap.api.annotation.Plugin;
-import co.cask.cdap.etl.api.batch.BatchSource;
-import co.cask.hydrator.common.AbstractFileBatchSource;
-import co.cask.hydrator.common.FileSourceConfig;
+import io.cdap.cdap.api.annotation.Description;
+import io.cdap.cdap.api.annotation.Macro;
+import io.cdap.cdap.api.annotation.Name;
+import io.cdap.cdap.api.annotation.Plugin;
+import io.cdap.cdap.etl.api.batch.BatchSource;
+import io.cdap.plugin.common.AbstractFileBatchSource;
+import io.cdap.plugin.common.FileSourceConfig;
 
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A {@link BatchSource} that reads from Azure Data Lake Store(ADLS).
  */
-@Plugin(type = "batchsource")
+@Plugin(type = BatchSource.PLUGIN_TYPE)
 @Name("AzureDataLakeStore")
 @Description("Batch source to use Azure Data Lake Store(ADLS) as a source.")
 public class ADLSBatchSource extends AbstractFileBatchSource {

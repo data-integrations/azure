@@ -2,7 +2,7 @@
   "metadata": {
     "spec-version": "1.5"
   },
-  "display-name" : "ADLS Batch Source",
+  "display-name" : "ADLS Batch Sink",
   "icon": {
     "type": "inline",
     "arguments": {
@@ -30,7 +30,7 @@
         },
         {
           "widget-type": "textbox",
-          "label": "Azure Data Lake Store Refresh Token",
+          "label": "Azure Data Lake Store Refresh Token URL",
           "name": "refreshTokenURL"
         },
         {
@@ -39,86 +39,27 @@
           "name": "credentials"
         },
         {
-          "widget-type": "textbox",
-          "label": "Maximum Split Size",
-          "name": "maxSplitSize"
-        },
-        {
-          "widget-type": "textbox",
-          "label": "Regex Path Filter",
-          "name": "fileRegex"
+          "widget-type": "json-editor",
+          "label": "File System Properties",
+          "name": "fileSystemProperties"
         },
         {
           "widget-type": "select",
-          "label": "Read files recursively",
-          "name": "recursive",
+          "label": "File Output Format",
+          "name": "outputFormat",
           "widget-attributes": {
             "values": [
-              "true",
-              "false"
+              "text",
+              "avro",
+              "orc"
             ],
-            "default": "false"
+            "default": "text"
           }
         },
         {
-          "label": "Output Schema Properties",
-          "properties": [
-            {
-              "widget-type": "textbox",
-              "label": "Path Field",
-              "name": "pathField",
-              "plugin-function": {
-                "method": "POST",
-                "widget": "outputSchema",
-                "output-property": "schema",
-                "plugin-method": "getSchema"
-              }
-            },
-            {
-              "widget-type": "select",
-              "label": "Use File Name as Path Field",
-              "name": "filenameOnly",
-              "widget-attributes": {
-                "values": [
-                  "true",
-                  "false"
-                ],
-                "default": "false"
-              }
-            }
-          ]
-        },
-        {
-          "label": "Advanced Properties",
-          "properties": [
-            {
-              "widget-type": "textbox",
-              "label": "Input Format Class",
-              "name": "inputFormatClass"
-            },
-            {
-              "widget-type": "json-editor",
-              "label": "File System Properties",
-              "name": "fileSystemProperties"
-            },
-            {
-              "widget-type": "select",
-              "label": "Ignore Non-Existing Folders",
-              "name": "ignoreNonExistingFolders",
-              "widget-attributes": {
-                "values": [
-                  "true",
-                  "false"
-                ],
-                "default": "false"
-              }
-            },
-            {
-              "widget-type": "textbox",
-              "label": "Time Table",
-              "name": "timeTable"
-            }
-          ]
+          "widget-type": "textbox",
+          "label": "Field Delimiter (only when output format is text)",
+          "name": "fieldDelimiter"
         }
       ]
     }
@@ -152,5 +93,4 @@
       }
     ]
   }
-
 }
