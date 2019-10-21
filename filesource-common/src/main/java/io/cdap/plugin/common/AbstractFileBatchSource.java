@@ -25,6 +25,7 @@ import io.cdap.cdap.api.dataset.lib.KeyValue;
 import io.cdap.cdap.api.dataset.lib.KeyValueTable;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.StageConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchSourceContext;
 import io.cdap.plugin.common.ReferenceBatchSource;
 import io.cdap.plugin.common.SourceInputFormatProvider;
@@ -89,11 +90,12 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
   @Override
   public void configurePipeline(PipelineConfigurer pipelineConfigurer) {
     super.configurePipeline(pipelineConfigurer);
-    config.validate();
+    StageConfigurer stageConfigurer = pipelineConfigurer.getStageConfigurer();
+    config.validate(stageConfigurer.getFailureCollector());
     if (!config.containsMacro("timeTable") && config.timeTable != null) {
       pipelineConfigurer.createDataset(config.timeTable, KeyValueTable.class, DatasetProperties.EMPTY);
     }
-    pipelineConfigurer.getStageConfigurer().setOutputSchema(DEFAULT_SCHEMA);
+    stageConfigurer.setOutputSchema(DEFAULT_SCHEMA);
   }
 
   @Override

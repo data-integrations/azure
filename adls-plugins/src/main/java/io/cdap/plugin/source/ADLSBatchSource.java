@@ -20,6 +20,7 @@ import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
+import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.batch.BatchSource;
 import io.cdap.plugin.common.AbstractFileBatchSource;
 import io.cdap.plugin.common.FileSourceConfig;
@@ -35,6 +36,7 @@ import java.util.Map;
 @Name("AzureDataLakeStore")
 @Description("Batch source to use Azure Data Lake Store(ADLS) as a source.")
 public class ADLSBatchSource extends AbstractFileBatchSource {
+  private static final String PATH = "path";
 
   @SuppressWarnings("unused")
   private final AzureBatchConfig config;
@@ -66,10 +68,10 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
     private String credentials;
 
     @Override
-    protected void validate() {
-      super.validate();
+    protected void validate(FailureCollector collector) {
+      super.validate(collector);
       if (!containsMacro("path") && !path.startsWith("adl://")) {
-        throw new IllegalArgumentException("Path must start with adl:// for ADLS input files.");
+        collector.addFailure("Path must start with adl:// for ADLS input files.", null).withConfigProperty(PATH);
       }
     }
 
