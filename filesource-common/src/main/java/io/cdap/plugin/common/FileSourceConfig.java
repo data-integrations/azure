@@ -144,7 +144,7 @@ public abstract class FileSourceConfig extends ReferencePluginConfig {
     }
     if (!CombinePathTrackingInputFormat.class.getName().equals(inputFormatClass) && pathField != null) {
       collector.addFailure("Path field can only be used if inputFormatClass is " +
-                             CombinePathTrackingInputFormat.class.getName(), null)
+                             CombinePathTrackingInputFormat.class.getName() + ".", null)
         .withConfigProperty(PATH_FIELD).withConfigProperty(INPUT_FORMAT_CLASS);
     }
   }

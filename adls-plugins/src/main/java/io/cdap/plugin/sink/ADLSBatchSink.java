@@ -202,7 +202,7 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
           String fieldName = outputField.getName();
           Schema.Field inputField = inputSchema.getField(outputField.getName());
           if (inputField == null) {
-            collector.addFailure("Input schema does not contain the " + fieldName + " field.", null)
+            collector.addFailure("Input schema does not contain the '" + fieldName + "' field.", null)
               .withOutputSchemaField(fieldName);
           } else {
             if (TEXT.equals(outputFormat)) {
@@ -230,7 +230,7 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
           .withConfigProperty(PATH);
       }
       if ((AVRO.equals(outputFormat) || ORC.equals(outputFormat)) && !containsMacro("schema") && schema == null) {
-        collector.addFailure("Output schema must be specified for avro or orc format output files.", null)
+        collector.addFailure("Output schema must be specified for 'avro' or 'orc' format output files.", null)
           .withConfigProperty(SCHEMA);
       }
     }
