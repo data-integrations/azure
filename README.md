@@ -1,9 +1,9 @@
-File Source Plugins
-=============
+Azure Data Lake Store Plugins
+=============================
 
 <a href="https://cdap-users.herokuapp.com/"><img alt="Join CDAP community" src="https://cdap-users.herokuapp.com/badge.svg?t=file-batch-source-plugins"/></a> [![Build Status](https://travis-ci.org/hydrator/file-batch-source-plugins.svg?branch=master)](https://travis-ci.org/hydrator/file-batch-source-plugins) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) <img alt="CDAP Batch Source" src="https://cdap-users.herokuapp.com/assets/cdap-batch-source.svg"/> []() <img src="https://cdap-users.herokuapp.com/assets/cm-available.svg"/>
 
-File source plugins to read from distributed file system.
+Plugins to read from Azure Data Lake Store plugins.
 
 
 Build
