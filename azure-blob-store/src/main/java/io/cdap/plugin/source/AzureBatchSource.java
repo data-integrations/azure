@@ -20,6 +20,7 @@ import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
+import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.batch.BatchSource;
 import io.cdap.plugin.common.AbstractFileBatchSource;
 import io.cdap.plugin.common.FileSourceConfig;
@@ -34,6 +35,8 @@ import java.util.Map;
 @Name("AzureBlobStore")
 @Description("Batch source to read from Azure Blob Storage.")
 public class AzureBatchSource extends AbstractFileBatchSource {
+  private static final String PATH = "path";
+
   @SuppressWarnings("unused")
   private final AzureBatchConfig config;
 
@@ -61,10 +64,11 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     private String storageKey;
 
     @Override
-    protected void validate() {
-      super.validate();
+    protected void validate(FailureCollector collector) {
+      super.validate(collector);
       if (!containsMacro("path") && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
-        throw new IllegalArgumentException("Path must start with adl:// for ADLS input files.");
+        collector.addFailure("Path must start with wasb:// or wasbs:// for ADLS input files.", null)
+          .withConfigProperty(PATH);
       }
     }
 

@@ -25,6 +25,7 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.dataset.lib.KeyValue;
 import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchRuntimeContext;
 import io.cdap.cdap.etl.api.batch.BatchSink;
@@ -79,12 +80,16 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
   @Override
   public void configurePipeline(PipelineConfigurer pipelineConfigurer) {
     super.configurePipeline(pipelineConfigurer);
-    config.validate(pipelineConfigurer.getStageConfigurer().getInputSchema());
+    config.validate(pipelineConfigurer.getStageConfigurer().getInputSchema(),
+                    pipelineConfigurer.getStageConfigurer().getFailureCollector());
   }
 
   @Override
   public void prepareRun(BatchSinkContext context) throws Exception {
-    config.validate();
+    FailureCollector collector = context.getFailureCollector();
+    config.validate(collector);
+    collector.getOrThrowException();
+
     Job job = JobUtils.createInstance();
     Configuration conf = job.getConfiguration();
 
@@ -141,6 +146,9 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
    * Plugin config for {@link ADLSBatchSink}.
    */
   public static class AzureBatchSinkConfig extends ReferencePluginConfig {
+    private static final String PATH = "path";
+    private static final String SCHEMA = "schema";
+
     protected static final String FILESYSTEM_PROPERTIES_DESCRIPTION = "A JSON string representing a map of properties " +
       "needed for the distributed file system.";
 
@@ -187,37 +195,43 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
       super(referenceName);
     }
 
-    protected void validate(Schema inputSchema) {
-      validate();
-      if (!containsMacro("schema")) {
+    protected void validate(Schema inputSchema, FailureCollector collector) {
+      validate(collector);
+      if (!containsMacro(SCHEMA)) {
         for (Schema.Field outputField : getSchema().getFields()) {
           String fieldName = outputField.getName();
           Schema.Field inputField = inputSchema.getField(outputField.getName());
           if (inputField == null) {
-            throw new IllegalArgumentException("Input schema does not contain the " + fieldName + " field.");
-          }
-          if (TEXT.equals(outputFormat)) {
-            Schema inputFieldSchema = inputField.getSchema();
-            Schema.Type inputType = inputFieldSchema.isNullable() ? inputFieldSchema.getNonNullable().getType() :
-              inputFieldSchema.getType();
-            switch (inputType) {
-              case ARRAY:
-              case MAP:
-              case RECORD:
-                throw new IllegalArgumentException("Cannot include field with name " + fieldName + " of type " +
-                                                     inputType + " in output schema of text output format.");
+            collector.addFailure("Input schema does not contain the '" + fieldName + "' field.", null)
+              .withOutputSchemaField(fieldName);
+          } else {
+            if (TEXT.equals(outputFormat)) {
+              Schema inputFieldSchema = inputField.getSchema();
+              inputFieldSchema = inputFieldSchema.isNullable() ? inputFieldSchema.getNonNullable() : inputFieldSchema;
+              Schema.Type inputType = inputFieldSchema.getType();
+              switch (inputType) {
+                case ARRAY:
+                case MAP:
+                case RECORD:
+                  collector.addFailure(String.format("Field '%s' is of unexpected type '%s'.", fieldName,
+                                                     inputFieldSchema.getDisplayName()),
+                                       "Provide type that is not array, map and record.")
+                    .withInputSchemaField(fieldName);
+              }
             }
           }
         }
       }
     }
 
-    protected void validate() {
-      if (!containsMacro("path") && !path.startsWith("adl://")) {
-        throw new IllegalArgumentException("Path must start with adl:// for ADLS input files.");
+    protected void validate(FailureCollector collector) {
+      if (!containsMacro(PATH) && !path.startsWith("adl://")) {
+        collector.addFailure("Path must start with adl:// for ADLS input files.", null)
+          .withConfigProperty(PATH);
       }
       if ((AVRO.equals(outputFormat) || ORC.equals(outputFormat)) && !containsMacro("schema") && schema == null) {
-        throw new IllegalArgumentException("Output schema must be specified for avro or orc format output files.");
+        collector.addFailure("Output schema must be specified for 'avro' or 'orc' format output files.", null)
+          .withConfigProperty(SCHEMA);
       }
     }
 

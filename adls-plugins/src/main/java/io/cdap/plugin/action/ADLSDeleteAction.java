@@ -102,8 +102,9 @@ public class ADLSDeleteAction extends Action {
       try {
         Pattern.compile(config.fileRegex);
       } catch (Exception e) {
-        throw new IllegalArgumentException(String.format("File regex %s is invalid: %s",
-                                                         config.fileRegex, e.getMessage()), e);
+        pipelineConfigurer.getStageConfigurer().getFailureCollector()
+          .addFailure(String.format("File regex '%s' is invalid: %s", config.fileRegex, e.getMessage()), null)
+          .withConfigProperty(ADLSDeleteActionConfig.FILE_REGEX);
       }
     }
   }
@@ -112,6 +113,7 @@ public class ADLSDeleteAction extends Action {
    * Config class that contains all properties necessary to execute an ADLS delete command.
    */
   public class ADLSDeleteActionConfig extends PluginConfig {
+    private static final String FILE_REGEX = "fileRegex";
     @Description("The full ADLS path of the file or files that need to be deleted. If path points to a file, " +
       "the file will be removed. If path points to a directory with no regex specified, the directory and all of " +
       "its contents will be removed. If a regex is specified, only the files and directories matching that regex " +

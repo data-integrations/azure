@@ -18,6 +18,7 @@ package io.cdap.plugin.common;
 
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
+import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.common.ReferencePluginConfig;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -33,6 +34,10 @@ import javax.annotation.Nullable;
  * Abstract file io.cdap.io.cdap.plugin.source config
  */
 public abstract class FileSourceConfig extends ReferencePluginConfig {
+  private static final String FILE_SYSTEM_PROPERTIES = "fileSystemProperties";
+  private static final String PATH_FIELD = "pathField";
+  private static final String INPUT_FORMAT_CLASS = "inputFormatClass";
+
   protected static final String MAX_SPLIT_SIZE_DESCRIPTION = "Maximum split-size for each mapper in the MapReduce " +
     "Job. Defaults to 128MB.";
   protected static final String TABLE_DESCRIPTION = "Name of the Table that keeps track of the last time files " +
@@ -131,11 +136,16 @@ public abstract class FileSourceConfig extends ReferencePluginConfig {
     this.schema = schema;
   }
 
-  protected void validate() {
-    getFileSystemProperties();
+  protected void validate(FailureCollector collector) {
+    try {
+      getFileSystemProperties();
+    } catch (IllegalArgumentException e) {
+      collector.addFailure(e.getMessage(), null).withConfigProperty(FILE_SYSTEM_PROPERTIES);
+    }
     if (!CombinePathTrackingInputFormat.class.getName().equals(inputFormatClass) && pathField != null) {
-      throw new IllegalArgumentException("pathField can only be used if inputFormatClass is " +
-                                           CombinePathTrackingInputFormat.class.getName());
+      collector.addFailure("Path field can only be used if inputFormatClass is " +
+                             CombinePathTrackingInputFormat.class.getName() + ".", null)
+        .withConfigProperty(PATH_FIELD).withConfigProperty(INPUT_FORMAT_CLASS);
     }
   }
 
