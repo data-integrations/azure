@@ -77,7 +77,7 @@ public class BatchFileFilter extends Configured implements PathFilter {
   public boolean accept(Path path) {
     String filePathName = path.toString();
     try {
-      FileSystem fileSystem = path.getFileSystem(new Configuration());
+      FileSystem fileSystem = path.getFileSystem(getConf());
       FileStatus[] fileStatus = fileSystem.globStatus(path);
       if (fileSystem.isDirectory(path) && !filePathName.endsWith("/")) {
         filePathName += "/";
@@ -127,6 +127,8 @@ public class BatchFileFilter extends Configured implements PathFilter {
     if (conf == null) {
       return;
     }
+
+    super.setConf(conf);
     pathName = conf.get(AbstractFileBatchSource.INPUT_NAME_CONFIG, "/");
 
     //path is a directory so remove trailing '/'

@@ -79,6 +79,7 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
     protected Map<String, String> getFileSystemProperties() {
       Map<String, String> properties = new HashMap<>(super.getFileSystemProperties());
       properties.put("fs.adl.impl", "org.apache.hadoop.fs.adl.AdlFileSystem");
+      properties.put("fs.adl.impl.disable.cache", "true");
       properties.put("fs.AbstractFileSystem.adl.impl", "org.apache.hadoop.fs.adl.Adl");
       properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
       properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
