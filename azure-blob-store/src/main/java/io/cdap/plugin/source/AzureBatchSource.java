@@ -76,6 +76,8 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     protected Map<String, String> getFileSystemProperties() {
       Map<String, String> properties = new HashMap<>(super.getFileSystemProperties());
       properties.put("fs.wasb.impl", "org.apache.hadoop.fs.azure.NativeAzureFileSystem");
+      properties.put("fs.wasb.impl.disable.cache", "true");
+      properties.put("fs.wasbs.impl.disable.cache", "true");
       properties.put("fs.AbstractFileSystem.wasb.impl", "org.apache.hadoop.fs.azure.Wasb");
       properties.put(String.format("fs.azure.account.key.%s", account), storageKey);
       return properties;
