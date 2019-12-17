@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * {@link BatchSource} for Azure Blob Store.
  */
-@Plugin(type = "batchsource")
+@Plugin(type = BatchSource.PLUGIN_TYPE)
 @Name("AzureBlobStore")
 @Description("Batch source to read from Azure Blob Storage.")
 public class AzureBatchSource extends AbstractFileBatchSource {
@@ -67,7 +67,7 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     protected void validate(FailureCollector collector) {
       super.validate(collector);
       if (!containsMacro("path") && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
-        collector.addFailure("Path must start with wasb:// or wasbs:// for ADLS input files.", null)
+        collector.addFailure("Path must start with wasb:// or wasbs:// for Windows Azure Storage Blob input files.", null)
           .withConfigProperty(PATH);
       }
     }
