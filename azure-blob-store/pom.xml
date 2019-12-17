@@ -21,7 +21,7 @@
   <parent>
     <artifactId>azure-adls-plugins</artifactId>
     <groupId>io.cdap.plugin</groupId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>io.cdap.plugin</groupId>
       <artifactId>filesource-common</artifactId>
-      <version>1.7.0-SNAPSHOT</version>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
