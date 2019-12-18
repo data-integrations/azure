@@ -81,12 +81,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.1.0-SNAPSHOT</cdap.version>
-    <cdap.plugin.version>2.3.0-SNAPSHOT</cdap.plugin.version>
+    <cdap.version>6.1.1</cdap.version>
+    <cdap.plugin.version>2.3.4</cdap.plugin.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
-    <app.parents>system:cdap-data-pipeline[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT)
+    <app.parents>system:cdap-data-pipeline[6.1.1,7.0.0-SNAPSHOT),system:cdap-data-streams[6.1.1,7.0.0-SNAPSHOT)
     </app.parents>
     <main.basedir>${project.basedir}</main.basedir>
   </properties>
