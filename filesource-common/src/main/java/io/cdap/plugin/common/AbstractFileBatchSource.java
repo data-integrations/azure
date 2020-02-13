@@ -27,8 +27,6 @@ import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.StageConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchSourceContext;
-import io.cdap.plugin.common.ReferenceBatchSource;
-import io.cdap.plugin.common.SourceInputFormatProvider;
 import io.cdap.plugin.common.batch.JobUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -53,6 +51,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Abstract file batch io.cdap.io.cdap.plugin.source
@@ -149,6 +148,18 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
     FileSystem pathFileSystem = FileSystem.get(new Path(config.getPath()).toUri(), conf);
     FileStatus[] fileStatus = pathFileSystem.globStatus(new Path(config.getPath()));
     fs = FileSystem.get(conf);
+
+    LineageRecorder lineageRecorder = new LineageRecorder(context, config.referenceName);
+    Schema schema = context.getOutputSchema();
+    if (schema != null) {
+      lineageRecorder.createExternalDataset(schema);
+
+      if (schema.getFields() != null) {
+        lineageRecorder.recordRead("Read", "Read from source.",
+            schema.getFields().stream().map(Schema.Field::getName).collect(
+                Collectors.toList()));
+      }
+    }
 
     if (fileStatus == null && config.ignoreNonExistingFolders) {
       LOG.warn(String.format("Input path %s does not exist and ignore non existing folder is set. " +
