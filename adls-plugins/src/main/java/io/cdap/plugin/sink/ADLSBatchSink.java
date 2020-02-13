@@ -31,6 +31,7 @@ import io.cdap.cdap.etl.api.batch.BatchRuntimeContext;
 import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 import io.cdap.plugin.common.HiveSchemaConverter;
+import io.cdap.plugin.common.LineageRecorder;
 import io.cdap.plugin.common.ReferenceBatchSink;
 import io.cdap.plugin.common.ReferencePluginConfig;
 import io.cdap.plugin.common.batch.JobUtils;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -114,6 +116,18 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
     } else {
       context.addOutput(Output.of(config.referenceName,
                                   new SinkOutputFormatProvider(TextOutputFormat.class.getName(), conf)));
+    }
+
+    LineageRecorder lineageRecorder = new LineageRecorder(context, config.referenceName);
+    Schema schema = context.getInputSchema();
+    if (schema != null) {
+      lineageRecorder.createExternalDataset(schema);
+
+      if (schema.getFields() != null) {
+        lineageRecorder.recordWrite("Write", "Write to ADLS",
+                                    schema.getFields().stream().map(Schema.Field::getName)
+                                      .collect(Collectors.toList()));
+      }
     }
   }
 
