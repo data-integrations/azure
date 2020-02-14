@@ -125,8 +125,8 @@ public class ADLSBatchSink extends ReferenceBatchSink<StructuredRecord, Object, 
 
       if (schema.getFields() != null) {
         lineageRecorder.recordWrite("Write", "Write to ADLS",
-            schema.getFields().stream().map(Schema.Field::getName).collect(
-                Collectors.toList()));
+                                    schema.getFields().stream().map(Schema.Field::getName)
+                                        .collect(Collectors.toList()));
       }
     }
   }
