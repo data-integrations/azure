@@ -156,7 +156,7 @@ public abstract class AbstractFileBatchSource<T extends FileSourceConfig>
 
       if (schema.getFields() != null) {
         lineageRecorder.recordRead("Read", "Read from source.",
-            schema.getFields().stream().map(Schema.Field::getName).collect(Collectors.toList()));
+          schema.getFields().stream().map(Schema.Field::getName).collect(Collectors.toList()));
       }
     }
 
