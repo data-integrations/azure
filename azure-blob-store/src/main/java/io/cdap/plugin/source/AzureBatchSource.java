@@ -97,8 +97,8 @@ public class AzureBatchSource extends AbstractFileBatchSource {
           .withConfigProperty(PATH);
       }
       if (!containsMacro("authType")) {
-        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
-          !(SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod)))) {
+        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
+          SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
           collector.addFailure(
             String.format(
               "Authentication method should be one of '%s' or '%s'",
