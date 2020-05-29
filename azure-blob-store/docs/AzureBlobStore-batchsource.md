@@ -24,7 +24,7 @@ files. The path must start with `wasb://` or `wasbs://`, for example, `wasb://my
 Azure Storage account name. (Macro-enabled)
 
 **Authentication Method:** The authentication method to use to connect to Microsoft Azure. Can be either 
-storageAccountKey or sasToken. Defaults to storageAccountKey. (Macro-enabled)
+`storageAccountKey` or `sasToken`. Defaults to `storageAccountKey`. (Macro-enabled)
 
 **Storage Key:** The storage key for the container on the Microsoft Azure Storage account. 
 Must be a valid base64 encoded storage key provided by Microsoft Azure. (Macro-enabled)

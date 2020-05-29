@@ -74,6 +74,7 @@ public class AzureBatchSource extends AbstractFileBatchSource {
 
     @Description("The storage key for the specified container on the specified Azure Storage account. Must be a " +
       "valid base64 encoded storage key provided by Microsoft Azure.")
+    @Nullable
     @Macro
     private String storageKey;
 
@@ -96,31 +97,25 @@ public class AzureBatchSource extends AbstractFileBatchSource {
           .withConfigProperty(PATH);
       }
       if (!containsMacro("authType")) {
-        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
-          SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
+        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
+          !(SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod)))) {
           collector.addFailure(
             String.format(
               "Authentication method should be one of '%s' or '%s'",
               STORAGE_ACCOUNT_KEY_AUTH_METHOD,
-              SAS_TOKEN_AUTH_METHOD
-            ), null)
-            .withConfigProperty(AUTHENTICATION_METHOD);
+              SAS_TOKEN_AUTH_METHOD), null).withConfigProperty(AUTHENTICATION_METHOD);
         }
         if (STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
           !containsMacro(storageKey) && Strings.isNullOrEmpty(storageKey)) {
           collector.addFailure(
             String.format("Storage key must be provided when authentication method is set to %s",
-                          STORAGE_ACCOUNT_KEY_AUTH_METHOD),
-            null
-          ).withConfigProperty(STORAGE_ACCOUNT_KEY);
+                          STORAGE_ACCOUNT_KEY_AUTH_METHOD), null).withConfigProperty(STORAGE_ACCOUNT_KEY);
         }
         if (SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
           !containsMacro(sasToken) && Strings.isNullOrEmpty(sasToken)) {
           collector.addFailure(
             String.format("Storage key must be provided when authentication method is set to %s",
-                          SAS_TOKEN_AUTH_METHOD),
-            null
-          ).withConfigProperty(SAS_TOKEN);
+                          SAS_TOKEN_AUTH_METHOD), null).withConfigProperty(SAS_TOKEN);
         }
       }
     }

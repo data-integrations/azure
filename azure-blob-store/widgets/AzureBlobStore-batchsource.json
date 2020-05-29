@@ -167,7 +167,7 @@
     {
       "name": "StorageAccountAuthentication",
       "condition": {
-        "expression": "authenticationMode == 'storageAccountKey'"
+        "expression": "authenticationMethod == 'storageAccountKey'"
       },
       "show": [
         {
@@ -178,7 +178,7 @@
     {
       "name": "SASAuthentication",
       "condition": {
-        "expression": "authenticationMode == 'sasToken'"
+        "expression": "authenticationMethod == 'sasToken'"
       },
       "show": [
         {
