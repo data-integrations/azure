@@ -14,18 +14,47 @@
         },
         {
           "widget-type": "textbox",
-          "label": "Azure Blob Store Path",
+          "label": "Path",
           "name": "path"
         },
         {
           "widget-type": "textbox",
-          "label": "Azure Blob Store Account",
+          "label": "Account",
           "name": "account"
+        },
+        {
+          "widget-type": "radio-group",
+          "label": "Authentication Method",
+          "name": "authenticationMethod",
+          "widget-attributes": {
+            "layout": "inline",
+            "default": "storageAccountKey",
+            "options": [
+              {
+                "id": "storageAccountKey",
+                "label": "Storage Account Key"
+              },
+              {
+                "id": "sasToken",
+                "label": "SAS Token"
+              }
+            ]
+          }
         },
         {
           "widget-type": "textbox",
           "label": "Azure Blob Store Storage Key",
           "name": "storageKey"
+        },
+        {
+          "widget-type": "textbox",
+          "label": "SAS Token",
+          "name": "sasToken"
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Container",
+          "name": "container"
         },
         {
           "widget-type": "textbox",
@@ -132,6 +161,33 @@
           ]
         }
       }
+    }
+  ],
+  "filters": [
+    {
+      "name": "StorageAccountAuthentication",
+      "condition": {
+        "expression": "authenticationMode == 'storageAccountKey'"
+      },
+      "show": [
+        {
+          "name": "storageKey"
+        }
+      ]
+    },
+    {
+      "name": "SASAuthentication",
+      "condition": {
+        "expression": "authenticationMode == 'sasToken'"
+      },
+      "show": [
+        {
+          "name": "sasToken"
+        },
+        {
+          "name": "container"
+        }
+      ]
     }
   ]
 }

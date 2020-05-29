@@ -16,6 +16,7 @@
 
 package io.cdap.plugin.source;
 
+import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
@@ -27,6 +28,7 @@ import io.cdap.plugin.common.FileSourceConfig;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * {@link BatchSource} for Azure Blob Store.
@@ -35,7 +37,6 @@ import java.util.Map;
 @Name("AzureBlobStore")
 @Description("Batch source to read from Azure Blob Storage.")
 public class AzureBatchSource extends AbstractFileBatchSource {
-  private static final String PATH = "path";
 
   @SuppressWarnings("unused")
   private final AzureBatchConfig config;
@@ -49,6 +50,13 @@ public class AzureBatchSource extends AbstractFileBatchSource {
    * Plugin config for {@link AzureBatchSource}.
    */
   public static class AzureBatchConfig extends FileSourceConfig {
+    private static final String PATH = "path";
+    private static final String AUTHENTICATION_METHOD = "authenticationMethod";
+    private static final String STORAGE_ACCOUNT_KEY = "storageKey";
+    private static final String SAS_TOKEN = "sasToken";
+    private static final String STORAGE_ACCOUNT_KEY_AUTH_METHOD = "storageAccountKey";
+    private static final String SAS_TOKEN_AUTH_METHOD = "sasToken";
+
     @Description("Path to file(s) to be read. If a directory is specified,terminate the path name with a '/'. " +
       "The path must start with `wasb://` or `wasbs://`.")
     @Macro
@@ -58,10 +66,27 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     @Macro
     private String account;
 
+    @Description("The authentication method to use to connect to Microsoft Azure. Can be either storageAccountKey " +
+      "or sasToken. Defaults to storageAccountKey.")
+    @Nullable
+    @Macro
+    private String authenticationMethod;
+
     @Description("The storage key for the specified container on the specified Azure Storage account. Must be a " +
       "valid base64 encoded storage key provided by Microsoft Azure.")
     @Macro
     private String storageKey;
+
+    @Description("The SAS token to use to connect to the specified container. Required when authentication method " +
+      "is set to SAS Token.")
+    @Nullable
+    @Macro
+    private String sasToken;
+
+    @Description("The container to connect to. Required when authentication method is set to SAS Token.")
+    @Nullable
+    @Macro
+    private String container;
 
     @Override
     protected void validate(FailureCollector collector) {
@@ -70,6 +95,34 @@ public class AzureBatchSource extends AbstractFileBatchSource {
         collector.addFailure("Path must start with wasb:// or wasbs:// for ADLS input files.", null)
           .withConfigProperty(PATH);
       }
+      if (!containsMacro("authType")) {
+        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
+          SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
+          collector.addFailure(
+            String.format(
+              "Authentication method should be one of '%s' or '%s'",
+              STORAGE_ACCOUNT_KEY_AUTH_METHOD,
+              SAS_TOKEN_AUTH_METHOD
+            ), null)
+            .withConfigProperty(AUTHENTICATION_METHOD);
+        }
+        if (STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
+          !containsMacro(storageKey) && Strings.isNullOrEmpty(storageKey)) {
+          collector.addFailure(
+            String.format("Storage key must be provided when authentication method is set to %s",
+                          STORAGE_ACCOUNT_KEY_AUTH_METHOD),
+            null
+          ).withConfigProperty(STORAGE_ACCOUNT_KEY);
+        }
+        if (SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
+          !containsMacro(sasToken) && Strings.isNullOrEmpty(sasToken)) {
+          collector.addFailure(
+            String.format("Storage key must be provided when authentication method is set to %s",
+                          SAS_TOKEN_AUTH_METHOD),
+            null
+          ).withConfigProperty(SAS_TOKEN);
+        }
+      }
     }
 
     @Override
@@ -77,7 +130,11 @@ public class AzureBatchSource extends AbstractFileBatchSource {
       Map<String, String> properties = new HashMap<>(super.getFileSystemProperties());
       properties.put("fs.wasb.impl", "org.apache.hadoop.fs.azure.NativeAzureFileSystem");
       properties.put("fs.AbstractFileSystem.wasb.impl", "org.apache.hadoop.fs.azure.Wasb");
-      properties.put(String.format("fs.azure.account.key.%s", account), storageKey);
+      if (STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod)) {
+        properties.put(String.format("fs.azure.account.key.%s", account), storageKey);
+      } else if (SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod)) {
+        properties.put(String.format("fs.azure.sas.%s.%s", container, account), sasToken);
+      }
       return properties;
     }
 
