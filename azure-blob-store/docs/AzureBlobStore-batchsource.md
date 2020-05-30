@@ -24,7 +24,7 @@ files. The path must start with `wasb://` or `wasbs://`, for example, `wasb://my
 Azure Storage account name. (Macro-enabled)
 
 **Authentication Method:** The authentication method to use to connect to Microsoft Azure. Can be either 
-`storageAccountKey` or `sasToken`. Defaults to `storageAccountKey`. (Macro-enabled)
+`storageAccountKey` or `sasToken`. Defaults to `storageAccountKey`.
 
 **Storage Key:** The storage key for the container on the Microsoft Azure Storage account. 
 Must be a valid base64 encoded storage key provided by Microsoft Azure. (Macro-enabled)
@@ -32,7 +32,7 @@ Must be a valid base64 encoded storage key provided by Microsoft Azure. (Macro-e
 **SAS Token:** The SAS token to use to connect to the specified container. Required when authentication method is set 
 to SAS Token. (Macro-enabled)
 
-**Container:** The container to connect to. Required when authentication method is set to SAS Token.
+**Container:** The container to connect to. Required when authentication method is set to SAS Token. (Macro-enabled)
 
 **Ignore Non-Existing Folders:** Identify if path needs to be ignored or not, for case when directory or file does not
 exists. If set to true it will treat the not present folder as 0 input and log a warning. Default is false.
