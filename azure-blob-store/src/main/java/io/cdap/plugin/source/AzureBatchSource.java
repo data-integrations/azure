@@ -54,6 +54,7 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     private static final String AUTHENTICATION_METHOD = "authenticationMethod";
     private static final String STORAGE_ACCOUNT_KEY = "storageKey";
     private static final String SAS_TOKEN = "sasToken";
+    private static final String CONTAINER = "container";
     private static final String STORAGE_ACCOUNT_KEY_AUTH_METHOD = "storageAccountKey";
     private static final String SAS_TOKEN_AUTH_METHOD = "sasToken";
 
@@ -66,10 +67,8 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     @Macro
     private String account;
 
-    @Description("The authentication method to use to connect to Microsoft Azure. Can be either storageAccountKey " +
-      "or sasToken. Defaults to storageAccountKey.")
-    @Nullable
-    @Macro
+    @Description("The authentication method to use to connect to Microsoft Azure. Can be either 'Storage Account Key'" +
+      " or 'SAS Token'. Defaults to 'Storage Account Key'.")
     private String authenticationMethod;
 
     @Description("The storage key for the specified container on the specified Azure Storage account. Must be a " +
@@ -79,12 +78,12 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     private String storageKey;
 
     @Description("The SAS token to use to connect to the specified container. Required when authentication method " +
-      "is set to SAS Token.")
+      "is set to 'SAS Token'.")
     @Nullable
     @Macro
     private String sasToken;
 
-    @Description("The container to connect to. Required when authentication method is set to SAS Token.")
+    @Description("The container to connect to. Required when authentication method is set to 'SAS Token'.")
     @Nullable
     @Macro
     private String container;
@@ -92,30 +91,28 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     @Override
     protected void validate(FailureCollector collector) {
       super.validate(collector);
-      if (!containsMacro("path") && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
+      if (!containsMacro(PATH) && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
         collector.addFailure("Path must start with wasb:// or wasbs:// for ADLS input files.", null)
           .withConfigProperty(PATH);
       }
-      if (!containsMacro("authType")) {
-        if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
-          SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
-          collector.addFailure(
-            String.format(
-              "Authentication method should be one of '%s' or '%s'",
-              STORAGE_ACCOUNT_KEY_AUTH_METHOD,
-              SAS_TOKEN_AUTH_METHOD), null).withConfigProperty(AUTHENTICATION_METHOD);
+      if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
+        SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
+        collector.addFailure("Authentication method should be one of 'Storage Account Key' or 'SAS Token'",
+                             null).withConfigProperty(AUTHENTICATION_METHOD);
+      }
+      if (STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
+        !containsMacro(STORAGE_ACCOUNT_KEY) && Strings.isNullOrEmpty(storageKey)) {
+        collector.addFailure("Storage key must be provided when authentication method is set " +
+                               "to 'Storage Account Key'", null).withConfigProperty(STORAGE_ACCOUNT_KEY);
+      }
+      if (SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod)) {
+        if (!containsMacro(SAS_TOKEN) && Strings.isNullOrEmpty(sasToken)) {
+          collector.addFailure("SAS token must be provided when authentication method is set to 'SAS Token'",
+                               null).withConfigProperty(SAS_TOKEN);
         }
-        if (STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
-          !containsMacro(storageKey) && Strings.isNullOrEmpty(storageKey)) {
-          collector.addFailure(
-            String.format("Storage key must be provided when authentication method is set to %s",
-                          STORAGE_ACCOUNT_KEY_AUTH_METHOD), null).withConfigProperty(STORAGE_ACCOUNT_KEY);
-        }
-        if (SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) &&
-          !containsMacro(sasToken) && Strings.isNullOrEmpty(sasToken)) {
-          collector.addFailure(
-            String.format("Storage key must be provided when authentication method is set to %s",
-                          SAS_TOKEN_AUTH_METHOD), null).withConfigProperty(SAS_TOKEN);
+        if (!containsMacro(CONTAINER) && Strings.isNullOrEmpty(container)) {
+          collector.addFailure("Container must be provided when authentication method is set to 'SAS Token'",
+                               null).withConfigProperty(CONTAINER);
         }
       }
     }
