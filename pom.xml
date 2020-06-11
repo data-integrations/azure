@@ -23,7 +23,7 @@
   <artifactId>azure-adls-plugins</artifactId>
   <packaging>pom</packaging>
   <name>Azure Adls Plugin Collection</name>
-  <version>1.7.2</version>
+  <version>1.7.3-SNAPSHOT</version>
 
   <licenses>
     <license>
