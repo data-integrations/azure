@@ -19,8 +19,8 @@ Properties
 **Path:** The path on Microsoft Azure Blob Storage to use as input. The path uses filename expansion (globbing) to read
 files. The path must start with `wasb://` or `wasbs://`, for example, `wasb://mycontainer@mystorageaccount.blob.core.windows.net/filename.txt`. (Macro-enabled)
 
-**Account:** The Microsoft Azure Blob Storage account to use. This is of the form 
-`mystorageaccount.blob.core.windows.net`, where `mystorageaccount` is the Microsoft 
+**Account:** The Microsoft Azure Blob Storage account to use. The account must end with `.blob.core.windows.net`. 
+For example, `mystorageaccount.blob.core.windows.net`, where `mystorageaccount` is the Microsoft 
 Azure Storage account name. (Macro-enabled)
 
 **Authentication Method:** The authentication method to use to connect to Microsoft Azure. Can be either 

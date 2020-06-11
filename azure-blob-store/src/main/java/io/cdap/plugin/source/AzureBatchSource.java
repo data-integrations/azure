@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 @Description("Batch source to read from Azure Blob Storage.")
 public class AzureBatchSource extends AbstractFileBatchSource {
   private static final String PATH = "path";
+  private static final String ACCOUNT = "account";
   private static final String AUTHENTICATION_METHOD = "authenticationMethod";
   private static final String STORAGE_ACCOUNT_KEY = "storageKey";
   private static final String SAS_TOKEN = "sasToken";
@@ -90,9 +91,13 @@ public class AzureBatchSource extends AbstractFileBatchSource {
     @Override
     protected void validate(FailureCollector collector) {
       super.validate(collector);
-      if (!containsMacro("path") && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
-        collector.addFailure("Path must start with wasb:// or wasbs:// for Windows Azure Storage Blob input files.", null)
+      if (!containsMacro(PATH) && (!path.startsWith("wasb://") && !path.startsWith("wasbs://"))) {
+        collector.addFailure("Path must start with wasb:// or wasbs:// for Windows Azure Blob Store input files.", null)
           .withConfigProperty(PATH);
+      }
+      if (!containsMacro(ACCOUNT) && !account.endsWith(".blob.core.windows.net")) {
+        collector.addFailure("Account must end with '.blob.core.windows.net' for Windows Azure Blob Store", null)
+          .withConfigProperty(ACCOUNT);
       }
       if (!(STORAGE_ACCOUNT_KEY_AUTH_METHOD.equalsIgnoreCase(authenticationMethod) ||
         SAS_TOKEN_AUTH_METHOD.equalsIgnoreCase(authenticationMethod))) {
