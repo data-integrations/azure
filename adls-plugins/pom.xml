@@ -31,7 +31,7 @@
     <dependency>
       <groupId>io.cdap.plugin</groupId>
       <artifactId>filesource-common</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.orc</groupId>
