@@ -23,7 +23,7 @@
   <artifactId>azure-adls-plugins</artifactId>
   <packaging>pom</packaging>
   <name>Azure Adls Plugin Collection</name>
-  <version>1.9.0-SNAPSHOT</version>
+  <version>1.9.0</version>
   <description>Plugins for Azure Adls</description>
   <url>https://github.com/data-integrations/azure</url>
 
@@ -90,8 +90,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.3.0-SNAPSHOT</cdap.version>
-    <cdap.plugin.version>2.5.0-SNAPSHOT</cdap.plugin.version>
+    <cdap.version>6.3.0</cdap.version>
+    <cdap.plugin.version>2.5.0</cdap.plugin.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
