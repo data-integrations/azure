@@ -90,7 +90,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.4.0-SNAPSHOT</cdap.version>
+    <cdap.version>6.5.0-SNAPSHOT</cdap.version>
     <cdap.plugin.version>2.6.0-SNAPSHOT</cdap.plugin.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
@@ -115,7 +115,7 @@
     </dependency>
     <dependency>
       <groupId>io.cdap.cdap</groupId>
-      <artifactId>cdap-data-pipeline</artifactId>
+      <artifactId>cdap-data-pipeline2_2.11</artifactId>
       <version>${cdap.version}</version>
       <scope>provided</scope>
     </dependency>
