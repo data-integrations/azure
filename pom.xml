@@ -23,7 +23,7 @@
   <artifactId>azure-adls-plugins</artifactId>
   <packaging>pom</packaging>
   <name>Azure Adls Plugin Collection</name>
-  <version>1.10.1</version>
+  <version>1.10.2-SNAPSHOT</version>
   <description>Plugins for Azure Adls</description>
   <url>https://github.com/data-integrations/azure</url>
 
