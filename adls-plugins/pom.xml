@@ -20,7 +20,7 @@
   <parent>
     <artifactId>azure-adls-plugins</artifactId>
     <groupId>io.cdap.plugin</groupId>
-    <version>1.14.1</version>
+    <version>1.14.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -43,11 +43,6 @@
           <artifactId>hadoop-hdfs</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-azure-datalake</artifactId>
-      <version>2.9.2</version>
     </dependency>
   </dependencies>
 

@@ -70,21 +70,34 @@ public class ADLSBatchSource extends AbstractFileBatchSource {
     @Override
     protected void validate(FailureCollector collector) {
       super.validate(collector);
-      if (!containsMacro("path") && !path.startsWith("adl://")) {
-        collector.addFailure("Path must start with adl:// for ADLS input files.", null).withConfigProperty(PATH);
+      if (!containsMacro("path") && !path.startsWith("abfs://")) {
+        collector.addFailure("Path must start with abfs:// for ADLS input files.", null).withConfigProperty(PATH);
       }
     }
 
     @Override
     protected Map<String, String> getFileSystemProperties() {
       Map<String, String> properties = new HashMap<>(super.getFileSystemProperties());
-      properties.put("fs.adl.impl", "org.apache.hadoop.fs.adl.AdlFileSystem");
-      properties.put("fs.adl.impl.disable.cache", "true");
-      properties.put("fs.AbstractFileSystem.adl.impl", "org.apache.hadoop.fs.adl.Adl");
-      properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
-      properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
-      properties.put("dfs.adls.oauth2.client.id", clientId);
-      properties.put("dfs.adls.oauth2.credential", credentials);
+      //gen1
+//      properties.put("fs.adl.impl", "org.apache.hadoop.fs.adl.AdlFileSystem");
+//      properties.put("fs.adl.impl.disable.cache", "true");
+//      properties.put("fs.AbstractFileSystem.adl.impl", "org.apache.hadoop.fs.adl.Adl");
+//      properties.put("dfs.adls.oauth2.access.token.provider.type", "ClientCredential");
+//      properties.put("dfs.adls.oauth2.refresh.url", refreshTokenURL);
+//      properties.put("dfs.adls.oauth2.client.id", clientId);
+//      properties.put("dfs.adls.oauth2.credential", credentials);
+
+      //gen2
+      properties.put("fs.abfs.impl", "org.apache.hadoop.fs.azurebfs.AzureBlobFileSystem");
+      properties.put("fs.azure.authorization.caching.enable", "false");
+      properties.put("fs.AbstractFileSystem.abfs.impl", "org.apache.hadoop.fs.azurebfs.Abfs");
+      properties.put("fs.azure.account.oauth.provider.type", "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
+      properties.put("fs.azure.account.oauth2.refresh.endpoint", refreshTokenURL);
+      properties.put("fs.azure.account.oauth2.client.id", clientId);
+      properties.put("fs.azure.account.oauth2.client.secret", credentials);
+//      properties.put("fs.azure.account.auth.type.adlsgen2kx.dfs.core.windows.net", "SharedKey");
+//      properties.put("fs.azure.account.key.adlsgen2kx.dfs.core.windows.net", "qbIVJOcLcp0weW+9dy1LzaUBGmMxTcF9jWX4ONdgKjnYkpDZEjwqvB4uF9Nrj82EYAgiBaoZf1kE+AStHvhDcw==");
+//      properties.put("fs.azure.createRemoteFileSystemDuringInitialization", "true");
       return properties;
     }
 

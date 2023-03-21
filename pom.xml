@@ -23,7 +23,7 @@
   <artifactId>azure-adls-plugins</artifactId>
   <packaging>pom</packaging>
   <name>Azure Adls Plugin Collection</name>
-  <version>1.14.1</version>
+  <version>1.14.1-SNAPSHOT</version>
   <description>Plugins for Azure Adls</description>
   <url>https://github.com/data-integrations/azure</url>
 
@@ -123,6 +123,21 @@
       <groupId>io.cdap.plugin</groupId>
       <artifactId>hydrator-common</artifactId>
       <version>${cdap.plugin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure</groupId>
+      <artifactId>azure-storage</artifactId>
+      <version>8.6.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-azure-datalake</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-azure</artifactId>
+      <version>3.3.1</version>
     </dependency>
   </dependencies>
 
