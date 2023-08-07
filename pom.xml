@@ -90,7 +90,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.9.0-SNAPSHOT</cdap.version>
+    <cdap.version>6.9.0</cdap.version>
     <hadoop.version>2.10.2</hadoop.version>
     <cdap.plugin.version>2.6.0</cdap.plugin.version>
     <widgets.dir>widgets</widgets.dir>
