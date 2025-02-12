@@ -79,24 +79,37 @@
 
   <repositories>
     <repository>
-      <id>sonatype.release</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>sonatype-snapshots</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.9.0</cdap.version>
-    <hadoop.version>2.10.2</hadoop.version>
-    <cdap.plugin.version>2.6.0</cdap.plugin.version>
+    <cdap.version>6.11.0-SNAPSHOT</cdap.version>
+    <hadoop.version>3.3.6</hadoop.version>
+    <cdap.plugin.version>2.13.0-SNAPSHOT</cdap.plugin.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
-    <app.parents>system:cdap-data-pipeline[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT)
+    <app.parents>
+      system:cdap-data-pipeline[6.11.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.11.0-SNAPSHOT,7.0.0-SNAPSHOT)
     </app.parents>
     <main.basedir>${project.basedir}</main.basedir>
   </properties>
