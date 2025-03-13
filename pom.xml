@@ -102,9 +102,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.11.0-SNAPSHOT</cdap.version>
+    <cdap.version>6.11.0</cdap.version>
     <hadoop.version>3.3.6</hadoop.version>
-    <cdap.plugin.version>2.13.0-SNAPSHOT</cdap.plugin.version>
+    <cdap.plugin.version>2.13.0</cdap.plugin.version>
     <jackson.databind.version>2.13.4.2</jackson.databind.version>
     <avro.version>1.11.4</avro.version>
     <widgets.dir>widgets</widgets.dir>
