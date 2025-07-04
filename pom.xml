@@ -65,11 +65,11 @@
   <distributionManagement>
     <repository>
       <id>sonatype.release</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2</url>
     </repository>
     <snapshotRepository>
       <id>sonatype.snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </snapshotRepository>
     <site>
       <id>cdap</id>
@@ -80,7 +80,7 @@
   <repositories>
     <repository>
       <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/groups/public</url>
+      <url>https://ossrh-staging-api.central.sonatype.com/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -90,7 +90,7 @@
     </repository>
     <repository>
       <id>sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
@@ -316,7 +316,7 @@
             <version>1.6.14</version>
             <extensions>true</extensions>
             <configuration>
-              <nexusUrl>https://oss.sonatype.org</nexusUrl>
+              <nexusUrl>https://ossrh-staging-api.central.sonatype.com</nexusUrl>
               <serverId>sonatype.release</serverId>
             </configuration>
           </plugin>
