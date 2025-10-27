@@ -64,10 +64,10 @@
 
   <repositories>
     <repository>
-      <id>sonatype-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots</url>
+      <id>artifact-registry</id>
+      <url>artifactregistry:us-maven.pkg.dev/oss-exit-gate-prod/cloud-data-fusion--mavencentral</url>
       <releases>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
@@ -90,6 +90,17 @@
     </app.parents>
     <main.basedir>${project.basedir}</main.basedir>
   </properties>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-maven.pkg.dev/oss-exit-gate-prod/cloud-data-fusion--mavencentral</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifact-registry</id>
+      <url>artifactregistry://us-maven.pkg.dev/oss-exit-gate-prod/cloud-data-fusion--mavencentral</url>
+    </repository>
+  </distributionManagement>
 
   <dependencies>
     <dependency>
@@ -134,6 +145,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.2.5</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -285,17 +303,6 @@
       <id>release</id>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.8.0</version>
-            <extensions>true</extensions>
-            <configuration>
-              <publishingServerId>sonatype.release</publishingServerId>
-              <autoPublish>false</autoPublish>
-              <ignorePublishedComponents>true</ignorePublishedComponents>
-            </configuration>
-          </plugin>
           <!-- Source JAR -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -337,23 +344,6 @@
                 <phase>package</phase>
                 <goals>
                   <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <configuration>
-              <passphrase>${gpg.passphrase}</passphrase>
-              <useAgent>${gpg.useagent}</useAgent>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>sign</goal>
                 </goals>
               </execution>
             </executions>
