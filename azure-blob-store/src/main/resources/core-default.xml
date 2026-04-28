@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <name>fs.file.impl</name>
+    <value>org.apache.hadoop.fs.LocalFileSystem</value>
+  </property>
+  <property>
+    <name>fs.hdfs.impl</name>
+    <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
+  </property>
+  <property>
+    <name>fs.abfs.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azurebfs.AzureBlobFileSystem</value>
+  </property>
+  <property>
+    <name>fs.abfss.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azurebfs.SecureAzureBlobFileSystem</value>
+  </property>
+  <property>
+    <name>fs.wasb.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azure.NativeAzureFileSystem</value>
+  </property>
+  <property>
+    <name>fs.wasbs.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azure.NativeAzureFileSystem$Secure</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.file.impl</name>
+    <value>org.apache.hadoop.fs.local.LocalFs</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.hdfs.impl</name>
+    <value>org.apache.hadoop.hdfs.Hdfs</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.abfs.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azurebfs.Abfs</value>
+  </property>
+  <property>
+    <name>fs.AbstractFileSystem.abfss.impl</name>
+    <value>io.cdap.plugin.azure.shaded.azurebfs.Abfss</value>
+  </property>
+</configuration>

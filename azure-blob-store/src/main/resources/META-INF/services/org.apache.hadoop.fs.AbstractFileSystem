@@ -1,0 +1,6 @@
+org.apache.hadoop.fs.local.LocalFs
+org.apache.hadoop.hdfs.Hdfs
+com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
+org.apache.hadoop.fs.viewfs.ViewFs
+io.cdap.plugin.azure.shaded.azurebfs.Abfs
+io.cdap.plugin.azure.shaded.azurebfs.Abfss

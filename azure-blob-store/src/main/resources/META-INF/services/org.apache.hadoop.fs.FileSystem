@@ -1,0 +1,10 @@
+org.apache.hadoop.fs.LocalFileSystem
+org.apache.hadoop.hdfs.DistributedFileSystem
+com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem
+org.apache.hadoop.fs.viewfs.ViewFileSystem
+org.apache.hadoop.fs.s3a.S3AFileSystem
+org.apache.hadoop.fs.s3n.NativeS3FileSystem
+io.cdap.plugin.azure.shaded.azurebfs.AzureBlobFileSystem
+io.cdap.plugin.azure.shaded.azurebfs.SecureAzureBlobFileSystem
+io.cdap.plugin.azure.shaded.azure.NativeAzureFileSystem
+io.cdap.plugin.azure.shaded.azure.NativeAzureFileSystem$Secure
