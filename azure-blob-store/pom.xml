@@ -31,13 +31,28 @@
   <dependencies>
     <dependency>
       <groupId>io.cdap.plugin</groupId>
-      <artifactId>filesource-common</artifactId>
-      <version>${project.parent.version}</version>
+      <artifactId>format-common</artifactId>
+      <version>${cdap.plugin.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-azure</artifactId>
       <version>${hadoop.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.databind.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure</groupId>
+      <artifactId>azure-data-lake-store-sdk</artifactId>
+      <version>2.3.10</version>
     </dependency>
   </dependencies>
 
@@ -49,7 +64,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <_exportcontents>io.cdap.plugin.*; io.cdap.plugin.common.*; org.apache.hadoop.fs.azure.*</_exportcontents>
+            <_exportcontents>io.cdap.plugin.*; io.cdap.plugin.common.*; org.apache.hadoop.fs.azure.*; org.apache.hadoop.fs.azurebfs.*</_exportcontents>
             <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Embed-Directory>lib</Embed-Directory>
