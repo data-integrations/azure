@@ -79,14 +79,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cdap.version>6.11.0</cdap.version>
     <hadoop.version>3.3.6</hadoop.version>
-    <cdap.plugin.version>2.13.0</cdap.plugin.version>
+    <cdap.plugin.version>2.13.1</cdap.plugin.version>
     <jackson.databind.version>2.13.4.2</jackson.databind.version>
     <avro.version>1.11.4</avro.version>
+    <guava.version>27.0-jre</guava.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
     <app.parents>
-      system:cdap-data-pipeline[6.11.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.11.0-SNAPSHOT,7.0.0-SNAPSHOT)
+      system:cdap-data-pipeline[6.11.0,7.0.0-SNAPSHOT),system:cdap-data-streams[6.11.0,7.0.0-SNAPSHOT)
     </app.parents>
     <main.basedir>${project.basedir}</main.basedir>
   </properties>
@@ -113,6 +114,11 @@
       <artifactId>cdap-etl-api</artifactId>
       <version>${cdap.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>io.cdap.cdap</groupId>
