@@ -303,6 +303,44 @@
         },
         {
           "widget-type": "radio-group",
+          "name": "recursive",
+          "label": "Read Files Recursively",
+          "widget-attributes": {
+            "layout": "inline",
+            "default": "false",
+            "options": [
+              {
+                "id": "true",
+                "label": "True"
+              },
+              {
+                "id": "false",
+                "label": "False"
+              }
+            ]
+          }
+        },
+        {
+          "widget-type": "radio-group",
+          "name": "ignoreNonExistingFolders",
+          "label": "Allow Empty Input",
+          "widget-attributes": {
+            "layout": "inline",
+            "default": "false",
+            "options": [
+              {
+                "id": "true",
+                "label": "True"
+              },
+              {
+                "id": "false",
+                "label": "False"
+              }
+            ]
+          }
+        },
+        {
+          "widget-type": "radio-group",
           "label": "Allow Empty Input",
           "name": "allowEmptyInput",
           "widget-attributes": {
@@ -598,6 +636,10 @@
             ],
             "default": "UTF-8"
           }
+        },
+        {
+          "widget-type": "hidden",
+          "name": "copyHeader"
         }
       ]
     }
