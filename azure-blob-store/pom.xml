@@ -31,13 +31,46 @@
   <dependencies>
     <dependency>
       <groupId>io.cdap.plugin</groupId>
-      <artifactId>filesource-common</artifactId>
-      <version>${project.parent.version}</version>
+      <artifactId>format-common</artifactId>
+      <version>${cdap.plugin.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-azure</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-azure</artifactId>
-      <version>${hadoop.version}</version>
+      <version>3.2.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>2.9.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.databind.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.azure</groupId>
+      <artifactId>azure-data-lake-store-sdk</artifactId>
+      <version>2.3.10</version>
     </dependency>
   </dependencies>
 
@@ -49,8 +82,9 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <_exportcontents>io.cdap.plugin.*; io.cdap.plugin.common.*; org.apache.hadoop.fs.azure.*</_exportcontents>
-            <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
+            <_exportcontents>io.cdap.plugin.*; io.cdap.plugin.common.*; io.cdap.plugin.azure.shaded.**; org.apache.hadoop.fs.*</_exportcontents>
+            <Import-Package>!org.apache.hadoop.fs.azure*,!org.apache.hadoop.fs.azurebfs*,!io.cdap.plugin.azure.shaded.*,*</Import-Package>
+            <Embed-Dependency>*;inline=true;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Embed-Directory>lib</Embed-Directory>
           </instructions>
@@ -61,6 +95,87 @@
             <goals>
               <goal>bundle</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <minimizeJar>false</minimizeJar>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.apache.hadoop:hadoop-common</exclude>
+                  <exclude>org.apache.hadoop:hadoop-auth</exclude>
+                  <exclude>org.apache.hadoop:hadoop-annotations</exclude>
+                  <exclude>org.apache.hadoop:hadoop-hdfs*</exclude>
+                  <exclude>org.apache.hadoop:hadoop-mapreduce*</exclude>
+                  <exclude>org.apache.hadoop:hadoop-yarn*</exclude>
+                  <exclude>org.apache.hadoop:hadoop-core</exclude>
+                </excludes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/*.EC</exclude>
+                    <exclude>META-INF/SIG-*</exclude>
+                    <exclude>org/apache/hadoop/fs/FileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/fs/LocalFileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/fs/RawLocalFileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/fs/FilterFileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/fs/HarFileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/fs/ChecksumFileSystem*.class</exclude>
+                    <exclude>org/apache/hadoop/conf/**</exclude>
+                    <exclude>org/apache/hadoop/security/**</exclude>
+                    <exclude>org/apache/hadoop/io/**</exclude>
+                    <exclude>org/apache/hadoop/util/**</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.hadoop.fs.azure</pattern>
+                  <shadedPattern>io.cdap.plugin.azure.shaded.azure</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.hadoop.fs.azurebfs</pattern>
+                  <shadedPattern>io.cdap.plugin.azure.shaded.azurebfs</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <exec executable="python3" failonerror="true">
+                  <arg value="${project.basedir}/patch_versioned_file_status.py"/>
+                  <arg value="${project.build.directory}/${project.build.finalName}.jar"/>
+                </exec>
+              </target>
+            </configuration>
           </execution>
         </executions>
       </plugin>
