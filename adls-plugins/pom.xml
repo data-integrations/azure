@@ -100,13 +100,31 @@
     <dependency>
       <groupId>org.apache.orc</groupId>
       <artifactId>orc-mapreduce</artifactId>
-      <version>1.1.0</version>
+      <version>1.9.9</version>
       <exclusions>
         <!-- Hadoop is provided by CDAP (hadoop-client 3.3.6, provided, in the parent pom). Without this, orc-mapreduce
              packages hadoop-mapreduce-client-core / hadoop-yarn-common 2.6.0 and with them Netty 3.6.2, log4j 1.2.17,
              slf4j-log4j12, jersey 1.9 and the codehaus jackson 1.9.13 jars. -->
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- orc-core 1.9.x needs protobuf-java 3.x and hive-storage-api at runtime, but its published (dependency-reduced)
+         pom does not list them. Without protobuf-java here, Hadoop's provided protobuf 2.5.0 would win. -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.25.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-storage-api</artifactId>
+      <version>2.8.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>

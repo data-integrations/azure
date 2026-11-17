@@ -159,6 +159,12 @@
         <artifactId>snappy</artifactId>
         <version>0.5</version>
       </dependency>
+      <!-- orc-core / orc-mapreduce 1.9.9 bring commons-lang3 3.12.0. -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.22.0</version>
+      </dependency>
       <dependency>
         <groupId>io.cdap.cdap</groupId>
         <artifactId>cdap-formats</artifactId>
