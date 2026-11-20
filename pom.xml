@@ -298,6 +298,31 @@
   </build>
   <profiles>
     <profile>
+      <!-- JDK 11+ no longer exposes the built-in Nashorn engine to the maven-antrun-plugin
+           class realm, so provide the standalone Nashorn engine for the javascript build step. -->
+      <id>jdk11-nashorn</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>org.openjdk.nashorn</groupId>
+                  <artifactId>nashorn-core</artifactId>
+                  <version>15.4</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>release</id>
       <build>
         <plugins>
