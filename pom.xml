@@ -80,7 +80,7 @@
     <cdap.version>6.11.0</cdap.version>
     <hadoop.version>3.3.6</hadoop.version>
     <cdap.plugin.version>2.13.0</cdap.plugin.version>
-    <jackson.databind.version>2.13.4.2</jackson.databind.version>
+    <jackson.version>2.23.0</jackson.version>
     <guava.version>32.0.0-jre</guava.version>
     <avro.version>1.11.4</avro.version>
     <widgets.dir>widgets</widgets.dir>
@@ -141,6 +141,30 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- orc-core 1.1.0 depends on jettison 1.1 and iq80 snappy 0.2 (CVE fixes in 1.5.7 / 0.5). -->
+      <dependency>
+        <groupId>org.codehaus.jettison</groupId>
+        <artifactId>jettison</artifactId>
+        <version>1.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.iq80.snappy</groupId>
+        <artifactId>snappy</artifactId>
+        <version>0.5</version>
+      </dependency>
+      <!-- orc-core / orc-mapreduce 1.9.9 bring commons-lang3 3.12.0. -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.22.0</version>
+      </dependency>
       <dependency>
         <groupId>io.cdap.cdap</groupId>
         <artifactId>cdap-formats</artifactId>

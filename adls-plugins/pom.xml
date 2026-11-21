@@ -28,6 +28,35 @@
   <artifactId>adls-plugins</artifactId>
 
   <dependencies>
+    <!-- Avro used to come in only through avro-ipc; declare it so the plugin jar still packages it. Its commons-*
+         dependencies were not packaged before either (Hadoop, provided, supplies them), so keep them out. -->
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>${avro.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-compress</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro-mapred</artifactId>
@@ -41,12 +70,21 @@
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
         </exclusion>
+        <!-- avro-ipc / avro-ipc-jetty are only used by Avro RPC (tether), not by AvroKeyOutputFormat. They bring
+             Jetty 9.4.54 (jetty-server, -http, -io, -servlet, -security, -util, -util-ajax) into the plugin jar. -->
+        <exclusion>
+          <groupId>org.apache.avro</groupId>
+          <artifactId>avro-ipc</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.avro</groupId>
+          <artifactId>avro-ipc-jetty</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -62,15 +100,32 @@
     <dependency>
       <groupId>org.apache.orc</groupId>
       <artifactId>orc-mapreduce</artifactId>
-      <version>1.1.0</version>
+      <version>1.9.9</version>
+      <exclusions>
+        <!-- Hadoop is provided by CDAP (hadoop-client 3.3.6, provided, in the parent pom). Without this, orc-mapreduce
+             packages hadoop-mapreduce-client-core / hadoop-yarn-common 2.6.0 and with them Netty 3.6.2, log4j 1.2.17,
+             slf4j-log4j12, jersey 1.9 and the codehaus jackson 1.9.13 jars. -->
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- orc-core 1.9.x needs protobuf-java 3.x and hive-storage-api at runtime, but its published (dependency-reduced)
+         pom does not list them. Without protobuf-java here, Hadoop's provided protobuf 2.5.0 would win. -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.25.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-storage-api</artifactId>
+      <version>2.8.1</version>
       <exclusions>
         <exclusion>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-hdfs</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-common</artifactId>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
