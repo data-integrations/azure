@@ -81,7 +81,8 @@
     <hadoop.version>3.3.6</hadoop.version>
     <cdap.plugin.version>2.13.0</cdap.plugin.version>
     <jackson.version>2.23.0</jackson.version>
-    <guava.version>32.0.0-jre</guava.version>
+    <guava.version>33.8.0-jre</guava.version>
+    <hadoop.shaded.guava.version>1.6.0</hadoop.shaded.guava.version>
     <avro.version>1.11.4</avro.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
@@ -141,6 +142,17 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      <!-- hadoop-azure 3.3.6 pulls hadoop-shaded-guava 1.1.1 (shading Guava 30.1.1-jre); 1.6.0 is the latest release. -->
+      <dependency>
+        <groupId>org.apache.hadoop.thirdparty</groupId>
+        <artifactId>hadoop-shaded-guava</artifactId>
+        <version>${hadoop.shaded.guava.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
